@@ -206,7 +206,7 @@ void RV32I::lb()
 	
 	// if printInfo, print the states of registers and mach. instruction
 	if (printInfo) {
-		printMachI();
+		printMach_I();
 		std::cout << "Assembly:\t\t\tlb rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
@@ -250,7 +250,7 @@ void RV32I::lh()
 
 	// if printInfo, print the mach. instruction and register states
 	if (printInfo) {
-		printMachI();
+		printMach_I();
 		std::cout << "Assembly:\t\t\tlh rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
@@ -304,7 +304,7 @@ void RV32I::lw()
 
 	// if printInfo, print register states and mach. instruction
 	if (printInfo) {
-		printMachI();
+		printMach_I();
 		std::cout << "Assembly:\t\t\tlw rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 		
@@ -354,7 +354,7 @@ void RV32I::lbu()
 	u8 byte	= memory[imm + regs[rs1]];
 
 	if (printInfo) {
-		printMachI();
+		printMach_I();
 		std::cout << "Assembly:\t\t\tlbu rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
@@ -394,7 +394,7 @@ void RV32I::lhu()
 	halfWord     |= lsb  << 0; 
 
 	if (printInfo) {
-		printMachI();
+		printMach_I();
 		std::cout << "Assembly:\t\t\tlhu rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
@@ -446,7 +446,7 @@ void RV32I::lwu()
 	word     |= lsb    <<  0;
 	
 	if (printInfo) {
-		printMachI();
+		printMach_I();
 		std::cout << "Assembly:\t\t\tlwu rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
@@ -496,7 +496,7 @@ void RV32I::sb()
 	u8 byte = regs[rs2] & 0xff;
 
 	if (printInfo) {
-		printMachS();
+		printMach_S();
 		std::cout << "Assembly:\t\t\tsb rs2, imm(rs1)" << std::endl;
 		printRegsImm_S(rs1, rs2, imm);
 
@@ -554,7 +554,7 @@ void RV32I::sw()
 }
 
 
-void RV32I::printMachI()
+void RV32I::printMach_I()
 {
 	std::string b3 = std::bitset<8>(byte3).to_string();
 	std::string b2 = std::bitset<8>(byte2).to_string();
@@ -573,7 +573,7 @@ void RV32I::printMachI()
 	std::cout << std::endl;
 }
 
-void RV32I::printMachS()
+void RV32I::printMach_S()
 {
 	std::string b3 = std::bitset<8>(byte3).to_string();
 	std::string b2 = std::bitset<8>(byte2).to_string();

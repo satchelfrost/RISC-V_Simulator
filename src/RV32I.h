@@ -56,8 +56,8 @@ private:
 	u8 byte3 = 0; // MSB
 
 	// Print stuff
-	void printMachI();
-	void printMachS();
+	void printMach_I();
+	void printMach_S();
 	void printRegsImm_I(u8 rs1, u8 rd, u16 imm);
 	void printRegsImm_S(u8 rs1, u8 rs2, u16 imm);
 

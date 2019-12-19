@@ -12,4 +12,4 @@ As of now I am only attempting to implement RV32I. We will see what the future h
 
 ### To see some sample instructions that were loaded from memory and executed:
 
-[a link](https://github.com/satchelfrost/RISC-V_Simulator/output)
+[Sample Ouput](https://github.com/satchelfrost/RISC-V_Simulator/blob/master/output)

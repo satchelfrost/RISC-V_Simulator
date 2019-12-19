@@ -10,4 +10,4 @@ This project aims to create a RISC-V instruction set simulator (ISS).
 
 As of now I am only attempting to implement RV32I. We will see what the future holds.
 
-[](output)
+![](output)

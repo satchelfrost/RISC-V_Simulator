@@ -1,0 +1,89 @@
+				imm[11:0]	rs1	funct3	rd	opcode
+Machine instruction:		000000001101	00011	000	00101	0000011
+Assembly:			lb rd, imm(rs1)
+Source register (rs1):		x3 = 9
+Destination register (rd):	x5 = 0 (before instruction)
+Memory offset (imm):		13
+x3 + imm:			22
+memory[x3 + imm]:		-125 (bin: 10000011)
+rd after instruction:		x5 = -125 (bin: 11111111 11111111 11111111 10000011)
+
+
+				imm[11:0]	rs1	funct3	rd	opcode
+Machine instruction:		000000001101	00011	001	00101	0000011
+Assembly:			lh rd, imm(rs1)
+Source register (rs1):		x3 = 9
+Destination register (rd):	x5 = 0 (before instruction)
+Memory offset (imm):		13
+x3 + imm:			22
+memory[x3 + imm + 1]:		-124 (bin: 10000100)
+memory[x3 + imm + 0]:		42 (bin: 00101010)
+Half word:			-31702 (bin: 10000100 00101010)
+rd after instruction:		x5 = -31702 (bin: 11111111 11111111 10000100 00101010)
+
+
+				imm[11:0]	rs1	funct3	rd	opcode
+Machine instruction:		000000001101	00011	010	00101	0000011
+Assembly:			lw rd, imm(rs1)
+Source register (rs1):		x3 = 9
+Destination register (rd):	x5 = 0 (before instruction)
+Memory offset (imm):		13
+x3 + imm:			22
+memory[x3 + imm + 3]:		-123 (bin: 10000101)
+memory[x3 + imm + 2]:		44 (bin: 00101100)
+memory[x3 + imm + 1]:		43 (bin: 00101011)
+memory[x3 + imm + 0]:		42 (bin: 00101010)
+Word (signed):			-2060702934 (bin: 10000101 00101100 00101011 00101010)
+rd after instruction:		x5 = -2060702934 (bin: 10000101 00101100 00101011 00101010)
+
+
+				imm[11:0]	rs1	funct3	rd	opcode
+Machine instruction:		000000001101	00011	100	00101	0000011
+Assembly:			lbu rd, imm(rs1)
+Source register (rs1):		x3 = 9
+Destination register (rd):	x5 = 0 (before instruction)
+Memory offset (imm):		13
+x3 + imm:			22
+memory[x3 + imm]:		-125 (bin: 10000011)
+rd after instruction:		x5 = 131 (bin: 00000000 00000000 00000000 10000011)
+
+
+				imm[11:0]	rs1	funct3	rd	opcode
+Machine instruction:		000000001101	00011	101	00101	0000011
+Assembly:			lhu rd, imm(rs1)
+Source register (rs1):		x3 = 9
+Destination register (rd):	x5 = 0 (before instruction)
+Memory offset (imm):		13
+x3 + imm:			22
+memory[x3 + imm + 1]:		-124 (bin: 10000100)
+memory[x3 + imm + 0]:		42 (bin: 00101010)
+Half word:			33834 (bin: 10000100 00101010)
+rd after instruction:		x5 = 33834 (bin: 00000000 00000000 10000100 00101010)
+
+
+				imm[11:0]	rs1	funct3	rd	opcode
+Machine instruction:		000000001101	00011	110	00101	0000011
+Assembly:			lwu rd, imm(rs1)
+Source register (rs1):		x3 = 9
+Destination register (rd):	x5 = 0 (before instruction)
+Memory offset (imm):		13
+x3 + imm:			22
+memory[x3 + imm + 3]:		-123 (bin: 10000101)
+memory[x3 + imm + 2]:		44 (bin: 00101100)
+memory[x3 + imm + 1]:		43 (bin: 00101011)
+memory[x3 + imm + 0]:		42 (bin: 00101010)
+Word:				2234264362 (bin: 10000101 00101100 00101011 00101010)
+rd after instruction:		x5 = 2234264362 (bin: 10000101 00101100 00101011 00101010)
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000101		00101	00011	000	01101		0100011
+Assembly:			sb rs2, imm(rs1)
+Source register (rs2):		x5 = 1234 (bin: 00000000 00000000 00000100 11010010)
+Source register (rs1):		x3 = 9
+Memory offset (imm):		173
+x3 + imm:			182
+memory[x3 + imm]:		-1 (before instruction) (bin: 11111111)
+memory[x3 + imm]:		-46 (after instruction) (bin: 11010010)
+
+

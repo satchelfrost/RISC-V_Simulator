@@ -14,6 +14,6 @@ As of now I am only attempting to implement RV32I.
 
 [Sample Ouput](https://github.com/satchelfrost/RISC-V_Simulator/blob/master/output)
 
-To explicitly see what binary instructions were loaded into memory look at "testInstr()" in RV32I.cpp:
+### To explicitly see what binary instructions were loaded into memory look at "testInstr()" in RV32I.cpp:
 
 [Machine instructions](https://github.com/satchelfrost/RISC-V_Simulator/blob/master/src/RV32I.cpp)

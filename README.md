@@ -12,7 +12,7 @@ As of now I am only attempting to implement RV32I.
 
 ### To see some sample instructions that were loaded from memory and executed:
 
-[Sample Ouput](https://github.com/satchelfrost/RISC-V_Simulator/blob/master/output)
+[Sample Ouput](https://github.com/satchelfrost/RISC-V_Simulator/blob/master/sampleOutput)
 
 ### To explicitly see what binary instructions were loaded into memory look at "testInstr()" in RV32I.cpp:
 

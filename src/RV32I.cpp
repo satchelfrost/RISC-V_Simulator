@@ -431,9 +431,9 @@ void RV32I::lwu()
 void RV32I::sb()
 {
 	// obtain bit fields of instruction
-	u8 rs1 = getRs1();
-	u8 rs2 = getRs2();
-	u8 imm = getSplitImm();
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	u16 imm = getSplitImm();
 
 	// error checks for S-format
 	errorCheck_S(rs2, rs1, imm);	
@@ -461,9 +461,9 @@ void RV32I::sb()
 void RV32I::sh()
 {
 	// obtain bit fields of instruction
-	u8 rs1 = getRs1();
-	u8 rs2 = getRs2();
-	u8 imm = getSplitImm();
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	u16 imm = getSplitImm();
 
 	// error checks for S-format
 	errorCheck_S(rs2, rs1, imm);
@@ -498,9 +498,9 @@ void RV32I::sh()
 void RV32I::sw()
 {
 	// obtain bit fields of instruction
-	u8 rs1 = getRs1();
-	u8 rs2 = getRs2();
-	u8 imm = getSplitImm();
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	u16 imm = getSplitImm();
 
 	// error checks for S-format
 	errorCheck_S(rs2, rs1, imm);	
@@ -693,7 +693,7 @@ RV32I::u8 RV32I::getRd()
 	return rd;	
 }
 
-RV32I::u8 RV32I::getSplitImm()
+RV32I::u16 RV32I::getSplitImm()
 {
 	// imm[11:5]
 	u8 imm11to5 = byte3 >> 1;
@@ -705,6 +705,8 @@ RV32I::u8 RV32I::getSplitImm()
 	// construct imm[11:0]
 	u16 imm  = imm11to5 << 5;
 	imm 	|= imm4to0;
+
+	return imm;
 }
 
 

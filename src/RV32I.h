@@ -77,7 +77,7 @@ private:
 	u8  getRs1();
 	u8  getRs2();
 	u8  getRd();
-	u8  getSplitImm();
+	u16 getSplitImm();
 	u16 getImmed();
 
 	// print bytes from binary

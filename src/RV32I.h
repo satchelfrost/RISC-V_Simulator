@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <bitset>
 
 class RV32I
 {
@@ -12,6 +13,10 @@ private:
 	typedef unsigned int   u32;
 	typedef unsigned short u16;
 	typedef unsigned char   u8;
+	typedef std::string string;
+	typedef std::bitset<8> u8Bit;
+	typedef std::bitset<16> u16Bit;
+	typedef std::bitset<32> u32Bit;
 	
 	bool printInfo = false; 
 	bool running = true;
@@ -73,7 +78,7 @@ private:
 	u16 getImmed();
 
 	// print bytes from binary
-	void printBytes(std::string bin);
+	void printBytes(string bin);
 
 	// Registers
 	u32 regs[32] = {

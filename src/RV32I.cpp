@@ -1,6 +1,5 @@
 #include "RV32I.h"
 #include <iostream>
-#include <bitset>
 
  RV32I::RV32I()
  {
@@ -186,8 +185,6 @@ void RV32I::testInstr(int test)
 		memory[182] =         -1;
 		break;
 	case 7:
-		// 0000101 00101 00011 001 01101 0100011
-		// 00001010 01010001 10010110 10100011
 		// sh x5, 173(x3)
 		memory[0]   = 0b10100011;
 		memory[1]   = 0b10010110;
@@ -197,6 +194,21 @@ void RV32I::testInstr(int test)
 		regs[5]     =       1234;
 		memory[182] =         -1;
 		memory[183] =         -2;
+		break;
+	case 8:
+		// 0000101 00101 00011 010 01101 0100011
+		// 00001010 01010001 10100110 10100011
+		// sh x5, 173(x3)
+		memory[0]   = 0b10100011;
+		memory[1]   = 0b10100110;
+		memory[2]   = 0b01010001;
+		memory[3]   = 0b00001010;
+		regs[3]     =          9;
+		regs[5]     =       1234;
+		memory[182] =         -1;
+		memory[183] =         -2;
+		memory[184] =         -3;
+		memory[185] =         -4;
 		break;
 	default:
 		std::cout << "No such test" << std::endl;
@@ -221,8 +233,8 @@ void RV32I::lb()
 		std::cout << "Assembly:\t\t\tlb rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
-		std::string bin   = std::bitset<8>(byte).to_string();
-		std::string bin32 = std::bitset<32>(signExtended).to_string();
+		string bin   = u8Bit(byte).to_string();
+		string bin32 = u32Bit(signExtended).to_string(); 
 
 		// show whats stored at memory location of interest
 		std::cout << "memory[x" << (int)rs1 << " + imm]:\t\t"
@@ -265,10 +277,10 @@ void RV32I::lh()
 		std::cout << "Assembly:\t\t\tlh rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
-		std::string msbBin = std::bitset<8>(msb).to_string();	
-		std::string lsbBin = std::bitset<8>(lsb).to_string();	
-		std::string hwBin  = std::bitset<16>(halfWord).to_string();	
-		std::string bin32  = std::bitset<32>(signExtended).to_string();
+		string msbBin = u8Bit(msb).to_string();   
+		string lsbBin = u8Bit(lsb).to_string();
+		string hwBin  = u16Bit(halfWord).to_string();
+		string bin32  = u32Bit(signExtended).to_string();
 
 		std::cout << "memory[x" << (int)rs1 << " + imm + 1]:\t\t"
 			<< (int)(signed char) msb;
@@ -319,11 +331,11 @@ void RV32I::lw()
 		std::cout << "Assembly:\t\t\tlw rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 		
-		std::string msbBin    = std::bitset<8>(msb).to_string();
-		std::string secMsbBin = std::bitset<8>(secMsb).to_string();
-		std::string secLsbBin = std::bitset<8>(secLsb).to_string();
-		std::string lsbBin    = std::bitset<8>(lsb).to_string();
-		std::string bin32     = std::bitset<32>(signExtended).to_string();
+		string msbBin    = u8Bit(msb).to_string();  
+		string secMsbBin = u8Bit(secMsb).to_string();
+		string secLsbBin = u8Bit(secLsb).to_string();
+		string lsbBin    = u8Bit(lsb).to_string();
+		string bin32     = u32Bit(signExtended).to_string(); 
 
 		std::cout << "memory[x" << (int)rs1  << " + imm + 3]:\t\t"
 			<< (int)(signed char) msb;
@@ -369,8 +381,8 @@ void RV32I::lbu()
 		std::cout << "Assembly:\t\t\tlbu rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
-		std::string bin   = std::bitset<8>(byte).to_string();
-		std::string bin32 = std::bitset<32>(byte).to_string();
+		string bin   = u8Bit(byte).to_string();  
+		string bin32 = u32Bit(byte).to_string();
 
 		regs[rd] = byte; 
 
@@ -409,10 +421,10 @@ void RV32I::lhu()
 		std::cout << "Assembly:\t\t\tlhu rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
-		std::string msbBin = std::bitset<8>(msb).to_string();
-		std::string lsbBin = std::bitset<8>(lsb).to_string();
-		std::string hwBin  = std::bitset<16>(halfWord).to_string();	
-		std::string bin32  = std::bitset<32>(halfWord).to_string();
+		string msbBin = u8Bit(msb).to_string();
+		string lsbBin = u8Bit(lsb).to_string();
+		string hwBin  = u16Bit(halfWord).to_string();	
+		string bin32  = u32Bit(halfWord).to_string();
 
 		std::cout << "memory[x" << (int)rs1 << " + imm + 1]:\t\t"
 			<< (int)(signed char) msb;
@@ -461,11 +473,11 @@ void RV32I::lwu()
 		std::cout << "Assembly:\t\t\tlwu rd, imm(rs1)" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
 
-		std::string msbBin     = std::bitset<8>(msb).to_string();
-		std::string secMsbBin  = std::bitset<8>(secMsb).to_string();
-		std::string secLsbBin  = std::bitset<8>(secLsb).to_string();
-		std::string lsbBin     = std::bitset<8>(lsb).to_string();
-		std::string bin32      = std::bitset<32>(word).to_string();
+		string msbBin     = u8Bit(msb).to_string();
+		string secMsbBin  = u8Bit(secMsb).to_string();
+		string secLsbBin  = u8Bit(secLsb).to_string();
+		string lsbBin     = u8Bit(lsb).to_string();
+		string bin32      = u32Bit(word).to_string();
 
 		std::cout << "memory[x" << (int)rs1 << " + imm + 3]:\t\t"
 			<< (int)(signed char) msb;
@@ -513,8 +525,8 @@ void RV32I::sb()
 
 		u8 memBefore = memory[imm + regs[rs1]];
 
-		std::string bin = std::bitset<8>(byte).to_string();
-		std::string binMemBefore = std::bitset<8>(memBefore).to_string();
+		string bin = u8Bit(byte).to_string();
+		string binMemBefore = u8Bit(memBefore).to_string();
 
 		std::cout << "memory[x" << (int)rs1 << " + imm]:\t\t"
 			<< (int)(signed char) memBefore << " (before instruction)";
@@ -542,8 +554,6 @@ void RV32I::sh()
 
 	errorCheck_S(rs2, rs1, imm);	
 
-	u16 halfWord = regs[rs2] & 0xff;
-
 	if (printInfo) {
 		printMach_S();
 		std::cout << "Assembly:\t\t\tsb rs2, imm(rs1)" << std::endl;
@@ -552,8 +562,8 @@ void RV32I::sh()
 		u8 lsbBefore = memory[imm + regs[rs1] + 0];
 		u8 msbBefore = memory[imm + regs[rs1] + 1];
 
-		std::string lsbBeforeBin = std::bitset<8>(lsbBefore).to_string();
-		std::string msbBeforeBin = std::bitset<8>(msbBefore).to_string();
+		string lsbBeforeBin = u8Bit(lsbBefore).to_string();   
+		string msbBeforeBin = u8Bit(msbBefore).to_string();
 
 		std::cout << "memory[x" << (int)rs1 << " + imm + 0]:\t\t"
 			<< (int)(signed char) lsbBefore << " (before instruction)";
@@ -568,8 +578,8 @@ void RV32I::sh()
 		memory[imm + regs[rs1] + 0] = lsbAfter; 
 		memory[imm + regs[rs1] + 1] = msbAfter;
 
-		std::string lsbAfterBin = std::bitset<8>(lsbAfter).to_string();
-		std::string msbAfterBin = std::bitset<8>(msbAfter).to_string();
+		string lsbAfterBin = u8Bit(lsbAfter).to_string();
+		string msbAfterBin = u8Bit(msbAfter).to_string();
 
 		std::cout << "memory[x" << (int)rs1 << " + imm + 0]:\t\t"
 			<< (int)(signed char) lsbAfter << " (after instruction)";
@@ -590,33 +600,66 @@ void RV32I::sh()
 
 void RV32I::sw()
 {
-	u8  rs1 = getRs1();
-	u8  rs2 = getRs2();
-	u8  imm = getSplitImm();
+	u8 rs1 = getRs1();
+	u8 rs2 = getRs2();
+	u8 imm = getSplitImm();
 
+	errorCheck_S(rs2, rs1, imm);	
 
-	u32 word = regs[rs2];
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tsb rs2, imm(rs1)" << std::endl;
+		printRegsImm_S(rs1, rs2, imm);
 
-	u8 msb    = (word >> 24) & 0xff;
-	u8 secMsb = (word >> 16) & 0xff;
-	u8 secLsb = (word >>  8) & 0xff;
-	u8 lsb    = (word >>  0) & 0xff;
+		u8 lsbBefore 	= memory[imm + regs[rs1] + 0];
+		u8 secLsbBefore = memory[imm + regs[rs1] + 1];
+		u8 secMsbBefore = memory[imm + regs[rs1] + 2];
+		u8 msbBefore 	= memory[imm + regs[rs1] + 3];
 
-	memory[imm + regs[rs1] + 3] = msb;
-	memory[imm + regs[rs1] + 2] = secMsb;
-	memory[imm + regs[rs1] + 1] = secLsb;
-	memory[imm + regs[rs1] + 0] = lsb;
+		string lsbBeforeBin = u8Bit(lsbBefore).to_string();
+		string msbBeforeBin = u8Bit(msbBefore).to_string();
+
+		std::cout << "memory[x" << (int)rs1 << " + imm + 0]:\t\t"
+			<< (int)(signed char) lsbBefore << " (before instruction)";
+		printBytes(lsbBeforeBin);
+		std::cout << "memory[x" << (int)rs1 << " + imm + 1]:\t\t"
+			<< (int)(signed char) msbBefore << " (before instruction)";
+		printBytes(msbBeforeBin);
+
+		u16 halfWord = regs[rs2];
+		u8 lsbAfter = halfWord;
+		u8 msbAfter = halfWord >> 8;
+		memory[imm + regs[rs1] + 0] = lsbAfter; 
+		memory[imm + regs[rs1] + 1] = msbAfter;
+
+		string lsbAfterBin = u8Bit(lsbAfter).to_string();
+		string msbAfterBin = u8Bit(msbAfter).to_string();
+
+		std::cout << "memory[x" << (int)rs1 << " + imm + 0]:\t\t"
+			<< (int)(signed char) lsbAfter << " (after instruction)";
+		printBytes(lsbAfterBin);
+
+		std::cout << "memory[x" << (int)rs1 << " + imm + 1]:\t\t"
+			<< (int)(signed char) msbAfter << " (after instruction)";
+		printBytes(msbAfterBin);
+
+	}
+
+	else { 
+		memory[imm + regs[rs1] + 0] = regs[rs2]; 
+		memory[imm + regs[rs1] + 1] = regs[rs2] >> 8; 
+	}
 
 }
 
 
 void RV32I::printMach_I()
 {
-	std::string b3 = std::bitset<8>(byte3).to_string();
-	std::string b2 = std::bitset<8>(byte2).to_string();
-	std::string b1 = std::bitset<8>(byte1).to_string();
-	std::string b0 = std::bitset<8>(byte0).to_string();
-	std::string machInstr = b3 + b2 + b1 + b0;
+	string b3 = u8Bit(byte3).to_string();
+	string b2 = u8Bit(byte2).to_string();
+	string b1 = u8Bit(byte1).to_string();
+	string b0 = u8Bit(byte0).to_string();
+	string machInstr = b3 + b2 + b1 + b0;
 
 	// print out the machine instruction with tabs in between fields
 	std::cout << "\t\t\t\timm[11:0]\trs1\tfunct3\trd\topcode\n";
@@ -631,11 +674,11 @@ void RV32I::printMach_I()
 
 void RV32I::printMach_S()
 {
-	std::string b3 = std::bitset<8>(byte3).to_string();
-	std::string b2 = std::bitset<8>(byte2).to_string();
-	std::string b1 = std::bitset<8>(byte1).to_string();
-	std::string b0 = std::bitset<8>(byte0).to_string();
-	std::string machInstr = b3 + b2 + b1 + b0;
+	string b3 = u8Bit(byte3).to_string();
+	string b2 = u8Bit(byte2).to_string();
+	string b1 = u8Bit(byte1).to_string();
+	string b0 = u8Bit(byte0).to_string();
+	string machInstr = b3 + b2 + b1 + b0;
 
 	// print out the machine instruction with tabs in between fields
 	std::cout << "\t\t\t\timm[11:5]\trs2\trs1\tfunct3\timm[4:0]\topcode\n";
@@ -670,7 +713,7 @@ void RV32I::printRegsImm_I(u8 rs1, u8 rd, u16 imm)
 
 void RV32I::printRegsImm_S(u8 rs1, u8 rs2, u16 imm)
 {
-	std::string bin32 = std::bitset<32>(regs[rs2]).to_string();
+	string bin32 = u32Bit(regs[rs2]).to_string();
 
 	std::cout << "Source register (rs2):\t\tx" << (int)rs2 << " = "
 		<< regs[rs2];
@@ -761,8 +804,7 @@ RV32I::u16 RV32I::getImmed()
 	return imm;	
 }
 
-
-void RV32I::printBytes(std::string bin)
+void RV32I::printBytes(string bin)
 {
 	std::cout << " (bin: "; 
 	for (auto i = 0; i < bin.size(); i++) {
@@ -771,9 +813,3 @@ void RV32I::printBytes(std::string bin)
 	}
 	std::cout << ")" << std::endl;
 }
-
-
-
-
-
-

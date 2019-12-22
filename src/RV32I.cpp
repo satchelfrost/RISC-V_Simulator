@@ -571,10 +571,10 @@ void RV32I::printRegsImm_I(u8 rs1, u8 rd, u16 imm)
 
 void RV32I::printRegsImm_S(u8 rs1, u8 rs2, u16 imm)
 {
-	string bin32 = u32Bit(regs[rs2]).to_string();
-
 	std::cout << "Source register (rs2):\t\tx" << (int)rs2 << " = "
 		<< regs[rs2] << std::endl;
+	std::cout << "Source reg. bin. (rs2):\t\tx" << (int)rs2 << " = ";
+	printBytes(u32Bit(regs[rs2]).to_string());
 	std::cout << "Source register (rs1):\t\tx" << (int)rs1 << " = "
 		<< regs[rs1] << std::endl;
 	std::cout << "Memory offset (imm):\t\t" << imm << std::endl;
@@ -594,13 +594,18 @@ void RV32I::printMemOffset(u8 rs1, int offset, u8 value)
 void RV32I::printRdSigned(u8 rd)
 {
 	std::cout << "rd after instruction:\t\t";
-	std::cout << "x" << (int)rd << " = " << (int)regs[rd];
-
+	std::cout << "x" << (int)rd << " = " << (int)regs[rd] << "\n";
+	std::cout << "rd after instr. binary:\t\t";
+	std::cout << "x" << (int)rd << " = "; 
+	printBytes(u32Bit(regs[rd]).to_string());
 }
 void RV32I::printRdUsigned(u8 rd)
 {
 	std::cout << "rd after instruction:\t\t";
-	std::cout << "x" << (int)rd << " = " << regs[rd];
+	std::cout << "x" << (int)rd << " = " << regs[rd] << "\n";
+	std::cout << "rd after instr. binary:\t\t";
+	std::cout << "x" << (int)rd << " = ";
+	printBytes(u32Bit(regs[rd]).to_string());
 }
 
 void RV32I::errorCheck_I(u8 rd, u8 rs1, u16 imm)	
@@ -686,9 +691,3 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
-
-
-
-
-
-

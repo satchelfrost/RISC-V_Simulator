@@ -5,8 +5,9 @@ Source register (rs1):		x3 = 9
 Destination register (rd):	x5 = 0 (before instruction)
 Memory offset (imm):		13
 x3 + imm:			22
-memory[x3 + imm]:		-125 (bin: 10000011)
-rd after instruction:		x5 = -125 (bin: 11111111 11111111 11111111 10000011)
+memory[x3 + imm + 0]:		10000011
+rd after instruction:		x5 = -125
+rd after instr. binary:		x5 = 11111111 11111111 11111111 10000011
 
 
 				imm[11:0]	rs1	funct3	rd	opcode
@@ -16,10 +17,10 @@ Source register (rs1):		x3 = 9
 Destination register (rd):	x5 = 0 (before instruction)
 Memory offset (imm):		13
 x3 + imm:			22
-memory[x3 + imm + 1]:		-124 (bin: 10000100)
-memory[x3 + imm + 0]:		42 (bin: 00101010)
-Half word:			-31702 (bin: 10000100 00101010)
-rd after instruction:		x5 = -31702 (bin: 11111111 11111111 10000100 00101010)
+memory[x3 + imm + 0]:		00101010
+memory[x3 + imm + 1]:		10000100
+rd after instruction:		x5 = -31702
+rd after instr. binary:		x5 = 11111111 11111111 10000100 00101010
 
 
 				imm[11:0]	rs1	funct3	rd	opcode
@@ -29,12 +30,12 @@ Source register (rs1):		x3 = 9
 Destination register (rd):	x5 = 0 (before instruction)
 Memory offset (imm):		13
 x3 + imm:			22
-memory[x3 + imm + 3]:		-123 (bin: 10000101)
-memory[x3 + imm + 2]:		44 (bin: 00101100)
-memory[x3 + imm + 1]:		43 (bin: 00101011)
-memory[x3 + imm + 0]:		42 (bin: 00101010)
-Word (signed):			-2060702934 (bin: 10000101 00101100 00101011 00101010)
-rd after instruction:		x5 = -2060702934 (bin: 10000101 00101100 00101011 00101010)
+memory[x3 + imm + 0]:		00101010
+memory[x3 + imm + 1]:		00101011
+memory[x3 + imm + 2]:		00101100
+memory[x3 + imm + 3]:		10000101
+rd after instruction:		x5 = -2060702934
+rd after instr. binary:		x5 = 10000101 00101100 00101011 00101010
 
 
 				imm[11:0]	rs1	funct3	rd	opcode
@@ -44,8 +45,9 @@ Source register (rs1):		x3 = 9
 Destination register (rd):	x5 = 0 (before instruction)
 Memory offset (imm):		13
 x3 + imm:			22
-memory[x3 + imm]:		-125 (bin: 10000011)
-rd after instruction:		x5 = 131 (bin: 00000000 00000000 00000000 10000011)
+memory[x3 + imm + 0]:		10000011
+rd after instruction:		x5 = 131
+rd after instr. binary:		x5 = 00000000 00000000 00000000 10000011
 
 
 				imm[11:0]	rs1	funct3	rd	opcode
@@ -55,10 +57,10 @@ Source register (rs1):		x3 = 9
 Destination register (rd):	x5 = 0 (before instruction)
 Memory offset (imm):		13
 x3 + imm:			22
-memory[x3 + imm + 1]:		-124 (bin: 10000100)
-memory[x3 + imm + 0]:		42 (bin: 00101010)
-Half word:			33834 (bin: 10000100 00101010)
-rd after instruction:		x5 = 33834 (bin: 00000000 00000000 10000100 00101010)
+memory[x3 + imm + 0]:		00101010
+memory[x3 + imm + 1]:		10000100
+rd after instruction:		x5 = 33834
+rd after instr. binary:		x5 = 00000000 00000000 10000100 00101010
 
 
 				imm[11:0]	rs1	funct3	rd	opcode
@@ -68,22 +70,59 @@ Source register (rs1):		x3 = 9
 Destination register (rd):	x5 = 0 (before instruction)
 Memory offset (imm):		13
 x3 + imm:			22
-memory[x3 + imm + 3]:		-123 (bin: 10000101)
-memory[x3 + imm + 2]:		44 (bin: 00101100)
-memory[x3 + imm + 1]:		43 (bin: 00101011)
-memory[x3 + imm + 0]:		42 (bin: 00101010)
-Word:				2234264362 (bin: 10000101 00101100 00101011 00101010)
-rd after instruction:		x5 = 2234264362 (bin: 10000101 00101100 00101011 00101010)
+memory[x3 + imm + 0]:		00101010
+memory[x3 + imm + 1]:		00101011
+memory[x3 + imm + 2]:		00101100
+memory[x3 + imm + 3]:		10000101
+rd after instruction:		x5 = 2234264362
+rd after instr. binary:		x5 = 10000101 00101100 00101011 00101010
 
 
 				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
 Machine instruction:		0000101		00101	00011	000	01101		0100011
 Assembly:			sb rs2, imm(rs1)
-Source register (rs2):		x5 = 1234 (bin: 00000000 00000000 00000100 11010010)
+Source register (rs2):		x5 = 1234
+Source reg. bin. (rs2):		x5 = 00000000 00000000 00000100 11010010
 Source register (rs1):		x3 = 9
 Memory offset (imm):		173
 x3 + imm:			182
-memory[x3 + imm]:		-1 (before instruction) (bin: 11111111)
-memory[x3 + imm]:		-46 (after instruction) (bin: 11010010)
+Before Instruction:
+memory[x3 + imm + 0]:		11111111
+After Instruction:
+memory[x3 + imm + 0]:		11010010
 
 
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000101		00101	00011	001	01101		0100011
+Assembly:			sh rs2, imm(rs1)
+Source register (rs2):		x5 = 1234
+Source reg. bin. (rs2):		x5 = 00000000 00000000 00000100 11010010
+Source register (rs1):		x3 = 9
+Memory offset (imm):		173
+x3 + imm:			182
+Before Instruction:
+memory[x3 + imm + 0]:		11111111
+memory[x3 + imm + 1]:		11111110
+After Instruction:
+memory[x3 + imm + 0]:		11010010
+memory[x3 + imm + 1]:		00000100
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000101		00101	00011	010	01101		0100011
+Assembly:			sw rs2, imm(rs1)
+Source register (rs2):		x5 = 1234
+Source reg. bin. (rs2):		x5 = 00000000 00000000 00000100 11010010
+Source register (rs1):		x3 = 9
+Memory offset (imm):		173
+x3 + imm:			182
+Before Instruction:
+memory[x3 + imm + 0]:		11111111
+memory[x3 + imm + 1]:		11111110
+memory[x3 + imm + 2]:		11111101
+memory[x3 + imm + 3]:		11111100
+After Instruction:
+memory[x3 + imm + 0]:		11010010
+memory[x3 + imm + 1]:		00000100
+memory[x3 + imm + 2]:		00000000
+memory[x3 + imm + 3]:		00000000

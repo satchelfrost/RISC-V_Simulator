@@ -65,6 +65,9 @@ private:
 	void printMach_S();
 	void printRegsImm_I(u8 rs1, u8 rd, u16 imm);
 	void printRegsImm_S(u8 rs1, u8 rs2, u16 imm);
+	void printMemOffset(u8 rs1, int offset, u8 value);
+	void printRdSigned(u8 rd);
+	void printRdUsigned(u8 rd);
 
 	// error check (memory in bounds? zero register zero?)
 	void errorCheck_I(u8 rd, u8 rs1, u16 imm);	

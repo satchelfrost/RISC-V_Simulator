@@ -215,15 +215,19 @@ void RV32I::testInstr(int test)
 
 void RV32I::lb()
 {
+	// obtain bit fields of instruction
 	u16 imm = getImmed();	
 	u8  rs1 =   getRs1();
 	u8  rd  =    getRd();
 
+	// error checks for I-format
 	errorCheck_I(rd, rs1, imm);
 	
+	// load byte and sign extend
 	u8 byte = memory[imm + regs[rs1]];
 	int signExtended = (int)(signed char) byte;
-	
+
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlb rd, imm(rs1)" << std::endl;
@@ -241,21 +245,27 @@ void RV32I::lb()
 
 void RV32I::lh()
 {
+
+	// obtain bit fields of instruction
 	u16 imm = getImmed();	
 	u8 rs1  = getRs1();
 	u8 rd   = getRd();
 
+	// error checks for I-format
 	errorCheck_I(rd, rs1, imm);
 
+	// load bytes from mem.
 	u8 msb  = memory[regs[rs1] + imm + 1];
 	u8 lsb  = memory[regs[rs1] + imm + 0];
 
+	// construct half word from bytes
 	u16 halfWord  = msb << 8;
 	halfWord     |= lsb << 0; 
 
+	// sign extend half word
 	int signExtended =  (int)(signed short) halfWord;
 
-	// if printInfo, print the mach. instruction and register states
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlh rd, imm(rs1)" << std::endl;
@@ -273,25 +283,30 @@ void RV32I::lh()
 
 void RV32I::lw()
 {
+	// obtain bit fields of instruction
 	u16 imm	= getImmed();	
 	u8 rs1	= getRs1();
 	u8 rd	= getRd();
 
+	// error checks for I-format
 	errorCheck_I(rd, rs1, imm);
 	
+	// load bytes from mem.
 	u8 msb    = memory[imm + regs[rs1] + 3];
 	u8 secMsb = memory[imm + regs[rs1] + 2];
 	u8 secLsb = memory[imm + regs[rs1] + 1];
 	u8 lsb    = memory[imm + regs[rs1] + 0];
 
+	// construct word from bytes
 	u32 word  = msb    << 24;
 	word     |= secMsb << 16;
 	word     |= secLsb <<  8;
 	word     |= lsb    <<  0;
 
+	// sign extend word
 	int signExtended =  (int) word;
 
-	// if printInfo, print register states and mach. instruction
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlw rd, imm(rs1)" << std::endl;
@@ -311,14 +326,18 @@ void RV32I::lw()
 
 void RV32I::lbu()
 {
+	// obtain bit fields of instruction
 	u16 imm = getImmed();	
 	u8 rs1	= getRs1();
 	u8 rd	= getRd();
 
+	// error checks for I-format
 	errorCheck_I(rd, rs1, imm);
 
+	// load byte from mem.
 	u8 byte	= memory[imm + regs[rs1]];
 
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlbu rd, imm(rs1)" << std::endl;
@@ -336,18 +355,23 @@ void RV32I::lbu()
 
 void RV32I::lhu()
 {
+	// obtain bit fields of instruction
 	u16 imm = getImmed();	
 	u8 rs1  = getRs1();
 	u8 rd   = getRd();
 
+	// error checks for I-format
 	errorCheck_I(rd, rs1, imm);
 
+	// load bytes from mem.
 	u8 msb = memory[regs[rs1] + imm + 1];
 	u8 lsb = memory[regs[rs1] + imm + 0];
 
+	// construct half word from bytes
 	u16 halfWord  = msb << 8;
 	halfWord     |= lsb  << 0; 
 
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlhu rd, imm(rs1)" << std::endl;
@@ -366,22 +390,27 @@ void RV32I::lhu()
 
 void RV32I::lwu()
 {
+	// obtain bit fields of instruction
 	u16 imm = getImmed();	
 	u8 rs1  = getRs1();
 	u8 rd   = getRd();
 
+	// error checks for I-format
 	errorCheck_I(rd, rs1, imm);
 	
+	// load bytes from mem.
 	u8 msb     = memory[imm + regs[rs1] + 3];
 	u8 secMsb  = memory[imm + regs[rs1] + 2];
 	u8 secLsb  = memory[imm + regs[rs1] + 1];
 	u8 lsb     = memory[imm + regs[rs1] + 0];
 
+	// construct half word from bytes
 	u32 word  = msb    << 24;
 	word     |= secMsb << 16;
 	word     |= secLsb <<  8;
 	word     |= lsb    <<  0;
 	
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlwu rd, imm(rs1)" << std::endl;
@@ -401,24 +430,25 @@ void RV32I::lwu()
 
 void RV32I::sb()
 {
+	// obtain bit fields of instruction
 	u8 rs1 = getRs1();
 	u8 rs2 = getRs2();
 	u8 imm = getSplitImm();
 
+	// error checks for S-format
 	errorCheck_S(rs2, rs1, imm);	
 
+	// obtain byte to be stored 
 	u8 byte = regs[rs2];
 
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_S();
 		std::cout << "Assembly:\t\t\tsb rs2, imm(rs1)" << std::endl;
 		printRegsImm_S(rs1, rs2, imm);
-		
 		std::cout << "Before Instruction:\n";
 		printMemOffset(rs1, 0, memory[imm + regs[rs1]]);
-
 		memory[imm + regs[rs1]] = byte; 
-
 		std::cout << "After Instruction:\n";
 		printMemOffset(rs1, 0, byte);
 	}
@@ -430,28 +460,29 @@ void RV32I::sb()
 
 void RV32I::sh()
 {
+	// obtain bit fields of instruction
 	u8 rs1 = getRs1();
 	u8 rs2 = getRs2();
 	u8 imm = getSplitImm();
 
+	// error checks for S-format
 	errorCheck_S(rs2, rs1, imm);
 
+	// obtain bytes to be stored 
 	u16 halfWord = regs[rs2];
 	u8 lsb = halfWord;
 	u8 msb = halfWord >> 8;
 
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_S();
 		std::cout << "Assembly:\t\t\tsh rs2, imm(rs1)" << std::endl;
 		printRegsImm_S(rs1, rs2, imm);
-		
 		std::cout << "Before Instruction:\n";
 		printMemOffset(rs1, 0, memory[imm + regs[rs1] + 0]);
 		printMemOffset(rs1, 1, memory[imm + regs[rs1] + 1]);
-
 		memory[imm + regs[rs1] + 0] = lsb; 
 		memory[imm + regs[rs1] + 1] = msb;
-
 		std::cout << "After Instruction:\n";
 		printMemOffset(rs1, 0, memory[imm + regs[rs1] + 0]);
 		printMemOffset(rs1, 1, memory[imm + regs[rs1] + 1]);
@@ -466,34 +497,35 @@ void RV32I::sh()
 
 void RV32I::sw()
 {
+	// obtain bit fields of instruction
 	u8 rs1 = getRs1();
 	u8 rs2 = getRs2();
 	u8 imm = getSplitImm();
 
+	// error checks for S-format
 	errorCheck_S(rs2, rs1, imm);	
 
+	// obtain bytes to be stored 
 	u32 word  = regs[rs2];
 	u8 lsb    = (word >> 0)  & 0xff;
 	u8 secLsb = (word >> 8)  & 0xff;
 	u8 secMsb = (word >> 16) & 0xff;
 	u8 msb    = (word >> 24) & 0xff;
 
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_S();
 		std::cout << "Assembly:\t\t\tsw rs2, imm(rs1)" << std::endl;
 		printRegsImm_S(rs1, rs2, imm);
-
 		std::cout << "Before Instruction:\n";
 		printMemOffset(rs1, 0, memory[imm + regs[rs1] + 0]);
 		printMemOffset(rs1, 1, memory[imm + regs[rs1] + 1]);
 		printMemOffset(rs1, 2, memory[imm + regs[rs1] + 2]);
 		printMemOffset(rs1, 3, memory[imm + regs[rs1] + 3]);
-
 		memory[imm + regs[rs1] + 0] = lsb; 
 		memory[imm + regs[rs1] + 1] = secLsb; 
 		memory[imm + regs[rs1] + 2] = secMsb; 
 		memory[imm + regs[rs1] + 3] = msb; 
-
 		std::cout << "After Instruction:\n";
 		printMemOffset(rs1, 0, memory[imm + regs[rs1] + 0]);
 		printMemOffset(rs1, 1, memory[imm + regs[rs1] + 1]);
@@ -509,7 +541,6 @@ void RV32I::sw()
 	}
 
 }
-
 
 void RV32I::printMach_I()
 {
@@ -632,11 +663,12 @@ void RV32I::errorCheck_S(u8 rs1, u8 rs2, u16 imm)
 {
 	// check if memory offset is actually in memory
 	if (regs[rs2] + imm > MaxMemory - 1) {
-		std::cout << "Memory offset (i.e. rs1 + imm.) out of range." << std::endl;
+		std::cout << "Memory offset (i.e. rs2 + imm.) out of range." << std::endl;
 		std::cout << "MaxMemory - 1 = " << MaxMemory - 1 << std::endl;
 		std::cout << "regs[rs2] + imm = " << regs[rs2] + imm << std::endl;
 		running = false;
 	}
+	// TODO: rs1 is unused here
 }
 
 RV32I::u8 RV32I::getRs1()

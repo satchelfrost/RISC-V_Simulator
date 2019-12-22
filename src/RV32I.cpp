@@ -176,9 +176,7 @@ void RV32I::testInstr(int test)
 		memory[25] =       -123;
 		break;
 	case 6:
-		// 00001010 01010001 10000110 10100011
-		// 0000101 00101 00011 000 01101 0100011
-		// sb x5, 13(x3)
+		// sb x5, 173(x3)
 		memory[0]   = 0b10100011;
 		memory[1]   = 0b10000110;
 		memory[2]   = 0b01010001;
@@ -186,6 +184,19 @@ void RV32I::testInstr(int test)
 		regs[3]     =          9;
 		regs[5]     =       1234;
 		memory[182] =         -1;
+		break;
+	case 7:
+		// 0000101 00101 00011 001 01101 0100011
+		// 00001010 01010001 10010110 10100011
+		// sh x5, 173(x3)
+		memory[0]   = 0b10100011;
+		memory[1]   = 0b10010110;
+		memory[2]   = 0b01010001;
+		memory[3]   = 0b00001010;
+		regs[3]     =          9;
+		regs[5]     =       1234;
+		memory[182] =         -1;
+		memory[183] =         -2;
 		break;
 	default:
 		std::cout << "No such test" << std::endl;
@@ -493,14 +504,14 @@ void RV32I::sb()
 
 	errorCheck_S(rs2, rs1, imm);	
 
-	u8 byte = regs[rs2] & 0xff;
+	u8 byte = regs[rs2];
 
 	if (printInfo) {
 		printMach_S();
 		std::cout << "Assembly:\t\t\tsb rs2, imm(rs1)" << std::endl;
 		printRegsImm_S(rs1, rs2, imm);
 
-		u32 memBefore = memory[imm + regs[rs1]];
+		u8 memBefore = memory[imm + regs[rs1]];
 
 		std::string bin = std::bitset<8>(byte).to_string();
 		std::string binMemBefore = std::bitset<8>(memBefore).to_string();
@@ -525,10 +536,55 @@ void RV32I::sb()
 
 void RV32I::sh()
 {
-	u8  rs1 = getRs1();
-	u8  rs2 = getRs2();
-	u8  imm = getSplitImm();
+	u8 rs1 = getRs1();
+	u8 rs2 = getRs2();
+	u8 imm = getSplitImm();
 
+	errorCheck_S(rs2, rs1, imm);	
+
+	u16 halfWord = regs[rs2] & 0xff;
+
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tsb rs2, imm(rs1)" << std::endl;
+		printRegsImm_S(rs1, rs2, imm);
+
+		u8 lsbBefore = memory[imm + regs[rs1] + 0];
+		u8 msbBefore = memory[imm + regs[rs1] + 1];
+
+		std::string lsbBeforeBin = std::bitset<8>(lsbBefore).to_string();
+		std::string msbBeforeBin = std::bitset<8>(msbBefore).to_string();
+
+		std::cout << "memory[x" << (int)rs1 << " + imm + 0]:\t\t"
+			<< (int)(signed char) lsbBefore << " (before instruction)";
+		printBytes(lsbBeforeBin);
+		std::cout << "memory[x" << (int)rs1 << " + imm + 1]:\t\t"
+			<< (int)(signed char) msbBefore << " (before instruction)";
+		printBytes(msbBeforeBin);
+
+		u16 halfWord = regs[rs2];
+		u8 lsbAfter = halfWord;
+		u8 msbAfter = halfWord >> 8;
+		memory[imm + regs[rs1] + 0] = lsbAfter; 
+		memory[imm + regs[rs1] + 1] = msbAfter;
+
+		std::string lsbAfterBin = std::bitset<8>(lsbAfter).to_string();
+		std::string msbAfterBin = std::bitset<8>(msbAfter).to_string();
+
+		std::cout << "memory[x" << (int)rs1 << " + imm + 0]:\t\t"
+			<< (int)(signed char) lsbAfter << " (after instruction)";
+		printBytes(lsbAfterBin);
+
+		std::cout << "memory[x" << (int)rs1 << " + imm + 1]:\t\t"
+			<< (int)(signed char) msbAfter << " (after instruction)";
+		printBytes(msbAfterBin);
+
+	}
+
+	else { 
+		memory[imm + regs[rs1] + 0] = regs[rs2]; 
+		memory[imm + regs[rs1] + 1] = regs[rs2] >> 8; 
+	}
 }
 
 

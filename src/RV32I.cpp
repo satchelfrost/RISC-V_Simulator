@@ -243,7 +243,8 @@ void RV32I::lb()
 	u8  rd  =    getRd();
 
 	// error checks for I-format
-	errorCheck_I(rd, rs1, imm);
+	zRegError(rd, rs1, imm);
+	memBoundErr(rs1, imm);
 	
 	// load byte and sign extend
 	u8 byte = memory[imm + regs[rs1]];
@@ -274,7 +275,8 @@ void RV32I::lh()
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	errorCheck_I(rd, rs1, imm);
+	zRegError(rd, rs1, imm);
+	memBoundErr(rs1, imm);
 
 	// load bytes from mem.
 	u8 msb  = memory[regs[rs1] + imm + 1];
@@ -311,7 +313,8 @@ void RV32I::lw()
 	u8 rd	= getRd();
 
 	// error checks for I-format
-	errorCheck_I(rd, rs1, imm);
+	zRegError(rd, rs1, imm);
+	memBoundErr(rs1, imm);
 	
 	// load bytes from mem.
 	u8 msb    = memory[imm + regs[rs1] + 3];
@@ -354,7 +357,8 @@ void RV32I::lbu()
 	u8 rd	= getRd();
 
 	// error checks for I-format
-	errorCheck_I(rd, rs1, imm);
+	zRegError(rd, rs1, imm);
+	memBoundErr(rs1, imm);
 
 	// load byte from mem.
 	u8 byte	= memory[imm + regs[rs1]];
@@ -383,7 +387,8 @@ void RV32I::lhu()
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	errorCheck_I(rd, rs1, imm);
+	zRegError(rd, rs1, imm);
+	memBoundErr(rs1, imm);
 
 	// load bytes from mem.
 	u8 msb = memory[regs[rs1] + imm + 1];
@@ -418,7 +423,8 @@ void RV32I::lwu()
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	errorCheck_I(rd, rs1, imm);
+	zRegError(rd, rs1, imm);
+	memBoundErr(rs1, imm);
 	
 	// load bytes from mem.
 	u8 msb     = memory[imm + regs[rs1] + 3];
@@ -458,7 +464,7 @@ void RV32I::sb()
 	u16 imm = getSplitImm();
 
 	// error checks for S-format
-	errorCheck_S(rs2, rs1, imm);	
+	memBoundErr(rs1, imm);
 
 	// obtain byte to be stored 
 	u8 byte = regs[rs2];
@@ -488,7 +494,7 @@ void RV32I::sh()
 	u16 imm = getSplitImm();
 
 	// error checks for S-format
-	errorCheck_S(rs2, rs1, imm);
+	memBoundErr(rs1, imm);
 
 	// obtain bytes to be stored 
 	u16 halfWord = regs[rs2];
@@ -525,7 +531,7 @@ void RV32I::sw()
 	u16 imm = getSplitImm();
 
 	// error checks for S-format
-	errorCheck_S(rs2, rs1, imm);	
+	memBoundErr(rs1, imm);
 
 	// obtain bytes to be stored 
 	u32 word  = regs[rs2];
@@ -572,8 +578,9 @@ void RV32I::addi()
 	u8  rd  =    getRd();
 
 	// error check 
-	// make sure regs[rs1] + imm;
+	zRegError(rd, rs1, imm);
 
+	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\taddi rd, rs1, imm" << std::endl;
@@ -730,36 +737,24 @@ void RV32I::printRdUsigned(u8 rd)
 	printBytes(u32Bit(regs[rd]).to_string());
 }
 
-void RV32I::errorCheck_I(u8 rd, u8 rs1, u16 imm)	
+void RV32I::zRegError(u8 rd, u8 rs1, u16 imm)
 {
-	// check if memory offset is actually in memory
-	if (regs[rs1] + imm > MaxMemory - 1) {
-		std::cout << "Memory offset (i.e. rs1 + imm.) out of range." << std::endl;
-		std::cout << "MaxMemory - 1 = " << MaxMemory - 1 << std::endl;
-		std::cout << "regs[rs1] + imm = " << regs[rs1] + imm << std::endl;
-		running = false;
-		return;
-	}
-
 	// check if zero register is being set to any value other than zero
 	if (rd == 0 && memory[regs[rs1] + imm] != 0) {
 		std::cout << "Cannot set zero register to anything other than zero."
 			<< std::endl;
 		running = false;
-		return;
 	}
 }
 
-void RV32I::errorCheck_S(u8 rs1, u8 rs2, u16 imm)	
+void RV32I::memBoundErr(u8 rs1, u16 imm)
 {
-	// check if memory offset is actually in memory
-	if (regs[rs2] + imm > MaxMemory - 1) {
-		std::cout << "Memory offset (i.e. rs2 + imm.) out of range." << std::endl;
+	if (regs[rs1] + imm > MaxMemory - 1) {
+		std::cout << "Memory offset (i.e. rs1 + imm.) out of range." << std::endl;
 		std::cout << "MaxMemory - 1 = " << MaxMemory - 1 << std::endl;
-		std::cout << "regs[rs2] + imm = " << regs[rs2] + imm << std::endl;
+		std::cout << "regs[rs1] + imm = " << regs[rs1] + imm << std::endl;
 		running = false;
 	}
-	// TODO: rs1 is unused here
 }
 
 RV32I::u8 RV32I::getRs1()
@@ -816,5 +811,9 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
+
+
+
+
 
 

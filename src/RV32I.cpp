@@ -61,6 +61,19 @@ void RV32I::fence()
 
 void RV32I::immediate()
 {
+	u8 funct3 = (byte1 >> 4) & 0b111;
+
+	switch (funct3) {
+	case 0b000: addi();	break; 
+	case 0b001: slli();	break; 
+	case 0b010: slti();	break;
+	case 0b011: sltiu();	break;
+	case 0b100: xori();	break;
+	case 0b101: sr();	break;
+	case 0b110: ori();	break;
+	case 0b111: andi();	break;
+	default: error();
+	}
 }
 
 void RV32I::jalr()
@@ -207,6 +220,15 @@ void RV32I::testInstr(int test)
 		memory[183] =         -2;
 		memory[184] =         -3;
 		memory[185] =         -4;
+		break;
+	case 9: 
+		
+		// addi x5, 13(x3)
+		memory[0]  = 0b10010011;
+		memory[1]  = 0b10000010;
+		memory[2]  = 0b11010001;
+		memory[3]  = 0b00000000;
+		regs[3]    =          9;
 		break;
 	default:
 		std::cout << "No such test" << std::endl;
@@ -542,6 +564,78 @@ void RV32I::sw()
 
 }
 
+void RV32I::addi()
+{
+	// obtain bit fields of instruction
+	u16 imm = getImmed();	
+	u8  rs1 =   getRs1();
+	u8  rd  =    getRd();
+
+	// error check 
+	// make sure regs[rs1] + imm;
+
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\taddi rd, rs1, imm" << std::endl;
+		printRegsImm_I(rs1, rd, imm);
+		regs[rd] = regs[rs1] + imm;
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = regs[rs1] + imm;
+	}
+
+}
+
+void RV32I::slti()
+{
+
+}
+
+void RV32I::sltiu()
+{
+
+}
+
+void RV32I::xori()
+{
+
+}
+
+void RV32I::ori()
+{
+
+}
+
+void RV32I::andi()
+{
+
+}
+
+void RV32I::slli()
+{
+
+}
+
+void RV32I::srli()
+{
+
+}
+
+void RV32I::srai()
+{
+
+}
+
+void RV32I::sr()
+{
+	// check bits 25 to 31
+	// if 0: srli
+	// if 1: srai
+	// else error
+}
+
 void RV32I::printMach_I()
 {
 	string b3 = u8Bit(byte3).to_string();
@@ -594,10 +688,7 @@ void RV32I::printRegsImm_I(u8 rs1, u8 rd, u16 imm)
 	std::cout << "Destination register (rd):\tx"
 		<< (int)rd
 		<< " = " << regs[rd] << " (before instruction)" << std::endl;
-	std::cout << "Memory offset (imm):\t\t" << imm << std::endl;
-	std::cout << "x"
-		<< (int)rs1 << " + imm:\t\t\t"
-		<< imm + regs[rs1] << std::endl;
+	std::cout << "offset (imm):\t\t\t" << imm << std::endl;
 }
 
 void RV32I::printRegsImm_S(u8 rs1, u8 rs2, u16 imm)
@@ -725,3 +816,5 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
+
+

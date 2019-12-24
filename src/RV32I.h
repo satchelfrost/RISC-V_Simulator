@@ -54,6 +54,18 @@ private:
 	void sh();
 	void sw();
 
+	// immediate instructions
+	void addi();
+	void slti();
+	void sltiu();
+	void xori();
+	void ori();
+	void andi();
+	void slli();
+	void srli();
+	void srai();
+	void sr();
+
 	// Bytes for constructing machine instruction 
 	u8 byte0 = 0; // LSB
 	u8 byte1 = 0;

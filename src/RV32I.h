@@ -82,7 +82,7 @@ private:
 	void printRdUsigned(u8 rd);
 
 	// error check (memory in bounds? zero register zero?)
-	void zRegError(u8 rd, u8 rs1, u16 imm);
+	void zRegError(int value);
 	void memBoundErr(u8 rs1, u16 imm);
 
 	// immed, rs1, rd

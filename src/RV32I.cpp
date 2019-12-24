@@ -242,13 +242,15 @@ void RV32I::lb()
 	u8  rs1 =   getRs1();
 	u8  rd  =    getRd();
 
-	// error checks for I-format
-	zRegError(rd, rs1, imm);
+	// memory bound error check 
 	memBoundErr(rs1, imm);
 	
 	// load byte and sign extend
 	u8 byte = memory[imm + regs[rs1]];
 	int signExtended = (int)(signed char) byte;
+
+	// zero register error check
+	if (rd == 0) zRegError(signExtended);
 
 	// print reg. states before and after instruction
 	if (printInfo) {
@@ -275,7 +277,6 @@ void RV32I::lh()
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	zRegError(rd, rs1, imm);
 	memBoundErr(rs1, imm);
 
 	// load bytes from mem.
@@ -288,6 +289,9 @@ void RV32I::lh()
 
 	// sign extend half word
 	int signExtended =  (int)(signed short) halfWord;
+
+	// zero register error check
+	if (rd == 0) zRegError(signExtended);
 
 	// print reg. states before and after instruction
 	if (printInfo) {
@@ -313,7 +317,6 @@ void RV32I::lw()
 	u8 rd	= getRd();
 
 	// error checks for I-format
-	zRegError(rd, rs1, imm);
 	memBoundErr(rs1, imm);
 	
 	// load bytes from mem.
@@ -330,6 +333,9 @@ void RV32I::lw()
 
 	// sign extend word
 	int signExtended =  (int) word;
+
+	// zero register error check
+	if (rd == 0) zRegError(signExtended);
 
 	// print reg. states before and after instruction
 	if (printInfo) {
@@ -357,11 +363,13 @@ void RV32I::lbu()
 	u8 rd	= getRd();
 
 	// error checks for I-format
-	zRegError(rd, rs1, imm);
 	memBoundErr(rs1, imm);
 
 	// load byte from mem.
 	u8 byte	= memory[imm + regs[rs1]];
+
+	// zero register error check
+	if (rd == 0) zRegError((int) byte);
 
 	// print reg. states before and after instruction
 	if (printInfo) {
@@ -387,7 +395,6 @@ void RV32I::lhu()
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	zRegError(rd, rs1, imm);
 	memBoundErr(rs1, imm);
 
 	// load bytes from mem.
@@ -397,6 +404,9 @@ void RV32I::lhu()
 	// construct half word from bytes
 	u16 halfWord  = msb << 8;
 	halfWord     |= lsb  << 0; 
+
+	// zero register error check
+	if (rd == 0) zRegError((int) halfWord);
 
 	// print reg. states before and after instruction
 	if (printInfo) {
@@ -423,7 +433,6 @@ void RV32I::lwu()
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	zRegError(rd, rs1, imm);
 	memBoundErr(rs1, imm);
 	
 	// load bytes from mem.
@@ -437,6 +446,9 @@ void RV32I::lwu()
 	word     |= secMsb << 16;
 	word     |= secLsb <<  8;
 	word     |= lsb    <<  0;
+
+	// zero register error check
+	if (rd == 0) zRegError((int) word);
 	
 	// print reg. states before and after instruction
 	if (printInfo) {
@@ -578,25 +590,49 @@ void RV32I::addi()
 	u8  rd  =    getRd();
 
 	// error check 
-	zRegError(rd, rs1, imm);
+	u32 value = regs[rs1] + imm;
+	if (rd == 0) zRegError((int) value);
 
 	// print reg. states before and after instruction
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\taddi rd, rs1, imm" << std::endl;
 		printRegsImm_I(rs1, rd, imm);
-		regs[rd] = regs[rs1] + imm;
+		regs[rd] = value; 
 		printRdSigned(rd);
 	}
 
 	else {
-		regs[rd] = regs[rs1] + imm;
+		regs[rd] = value; 
 	}
 
 }
 
 void RV32I::slti()
 {
+	// obtain bit fields of instruction
+	u16 imm = getImmed();	
+	u8  rs1 =   getRs1();
+	u8  rd  =    getRd();
+
+	// calculate value for slti
+	u32 value = ((int) regs[rs1] < imm) ? 1 : 0;
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tslti rd, rs1, imm" << std::endl;
+		printRegsImm_I(rs1, rd, imm);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 
 }
 
@@ -737,10 +773,10 @@ void RV32I::printRdUsigned(u8 rd)
 	printBytes(u32Bit(regs[rd]).to_string());
 }
 
-void RV32I::zRegError(u8 rd, u8 rs1, u16 imm)
+
+void RV32I::zRegError(int value)
 {
-	// check if zero register is being set to any value other than zero
-	if (rd == 0 && memory[regs[rs1] + imm] != 0) {
+	if (value != 0) {
 		std::cout << "Cannot set zero register to anything other than zero."
 			<< std::endl;
 		running = false;
@@ -811,6 +847,7 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
+
 
 
 

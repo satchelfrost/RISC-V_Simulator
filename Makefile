@@ -1,6 +1,9 @@
-compRun:
+current:
 	g++ -o bin/main src/*.cpp -Werror
-	./bin/main 0 1 2 3 4 5 6 7 8
+	./bin/main 10 11 
+all:
+	g++ -o bin/main src/*.cpp -Werror
+	./bin/main 0 1 2 3 4 5 6 7 8 9 10
 comp:
 	g++ -o bin/main src/*.cpp -Werror
 run:

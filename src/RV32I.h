@@ -13,6 +13,9 @@ private:
 	typedef unsigned int   u32;
 	typedef unsigned short u16;
 	typedef unsigned char   u8;
+
+	typedef signed short s16;
+	
 	typedef std::string string;
 	typedef std::bitset<8> u8Bit;
 	typedef std::bitset<16> u16Bit;
@@ -75,22 +78,22 @@ private:
 	// Print stuff
 	void printMach_I();
 	void printMach_S();
-	void printRegsImm_I(u8 rs1, u8 rd, u16 imm);
-	void printRegsImm_S(u8 rs1, u8 rs2, u16 imm);
+	void printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned);
+	void printRegsImm_S(u8 rs1, u8 rs2, s16 imm);
 	void printMemOffset(u8 rs1, int offset, u8 value);
 	void printRdSigned(u8 rd);
 	void printRdUsigned(u8 rd);
 
 	// error check (memory in bounds? zero register zero?)
 	void zRegError(int value);
-	void memBoundErr(u8 rs1, u16 imm);
+	void memBoundErr(u8 rs1, s16 imm, int i);
 
 	// immed, rs1, rd
 	u8  getRs1();
 	u8  getRs2();
 	u8  getRd();
-	u16 getSplitImm();
-	u16 getImmed();
+	s16 getSplitImm();
+	s16 getImmed();
 
 	// print bytes from binary
 	void printBytes(string bin);

@@ -222,13 +222,28 @@ void RV32I::testInstr(int test)
 		memory[185] =         -4;
 		break;
 	case 9: 
-		
-		// addi x5, 13(x3)
+		// addi x5, x3, 13
 		memory[0]  = 0b10010011;
 		memory[1]  = 0b10000010;
 		memory[2]  = 0b11010001;
 		memory[3]  = 0b00000000;
 		regs[3]    =          9;
+		break;
+	case 10:
+		// stli rd, rs1, imm
+		memory[0]  = 0b10010011;
+		memory[1]  = 0b10100010;
+		memory[2]  = 0b11010001;
+		memory[3]  = 0b00000000;
+		regs[3]    =        -13;
+		break;
+	case 11:
+		// stli rd, rs1, imm
+		memory[0]  = 0b10010011;
+		memory[1]  = 0b10110010;
+		memory[2]  = 0b11010001;
+		memory[3]  = 0b00000000;
+		regs[3]    =        -13;
 		break;
 	default:
 		std::cout << "No such test" << std::endl;
@@ -238,12 +253,12 @@ void RV32I::testInstr(int test)
 void RV32I::lb()
 {
 	// obtain bit fields of instruction
-	u16 imm = getImmed();	
+	s16 imm = getImmed();	
 	u8  rs1 =   getRs1();
 	u8  rd  =    getRd();
 
 	// memory bound error check 
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 1);
 	
 	// load byte and sign extend
 	u8 byte = memory[imm + regs[rs1]];
@@ -256,7 +271,7 @@ void RV32I::lb()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlb rd, imm(rs1)" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, true);
 		printMemOffset(rs1, 0, byte);
 		regs[rd] = signExtended;
 		printRdSigned(rd);
@@ -272,12 +287,12 @@ void RV32I::lh()
 {
 
 	// obtain bit fields of instruction
-	u16 imm = getImmed();	
+	s16 imm = getImmed();	
 	u8 rs1  = getRs1();
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 2);
 
 	// load bytes from mem.
 	u8 msb  = memory[regs[rs1] + imm + 1];
@@ -297,7 +312,7 @@ void RV32I::lh()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlh rd, imm(rs1)" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, true);
 		printMemOffset(rs1, 0, lsb);
 		printMemOffset(rs1, 1, msb);
 		regs[rd] = signExtended;
@@ -312,12 +327,12 @@ void RV32I::lh()
 void RV32I::lw()
 {
 	// obtain bit fields of instruction
-	u16 imm	= getImmed();	
+	s16 imm	= getImmed();	
 	u8 rs1	= getRs1();
 	u8 rd	= getRd();
 
 	// error checks for I-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 4);
 	
 	// load bytes from mem.
 	u8 msb    = memory[imm + regs[rs1] + 3];
@@ -341,7 +356,7 @@ void RV32I::lw()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlw rd, imm(rs1)" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, true);
 		printMemOffset(rs1, 0, lsb);
 		printMemOffset(rs1, 1, secLsb);
 		printMemOffset(rs1, 2, secMsb);
@@ -358,12 +373,12 @@ void RV32I::lw()
 void RV32I::lbu()
 {
 	// obtain bit fields of instruction
-	u16 imm = getImmed();	
+	s16 imm = getImmed();	
 	u8 rs1	= getRs1();
 	u8 rd	= getRd();
 
 	// error checks for I-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 1);
 
 	// load byte from mem.
 	u8 byte	= memory[imm + regs[rs1]];
@@ -375,7 +390,7 @@ void RV32I::lbu()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlbu rd, imm(rs1)" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, false);
 		printMemOffset(rs1, 0, byte);
 		regs[rd] = byte; 
 		printRdUsigned(rd);
@@ -390,12 +405,12 @@ void RV32I::lbu()
 void RV32I::lhu()
 {
 	// obtain bit fields of instruction
-	u16 imm = getImmed();	
+	s16 imm = getImmed();	
 	u8 rs1  = getRs1();
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 2);
 
 	// load bytes from mem.
 	u8 msb = memory[regs[rs1] + imm + 1];
@@ -412,7 +427,7 @@ void RV32I::lhu()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlhu rd, imm(rs1)" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, false);
 		printMemOffset(rs1, 0, lsb);
 		printMemOffset(rs1, 1, msb);
 		regs[rd] = halfWord;
@@ -428,12 +443,12 @@ void RV32I::lhu()
 void RV32I::lwu()
 {
 	// obtain bit fields of instruction
-	u16 imm = getImmed();	
+	s16 imm = getImmed();	
 	u8 rs1  = getRs1();
 	u8 rd   = getRd();
 
 	// error checks for I-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 4);
 	
 	// load bytes from mem.
 	u8 msb     = memory[imm + regs[rs1] + 3];
@@ -454,7 +469,7 @@ void RV32I::lwu()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tlwu rd, imm(rs1)" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, false);
 		printMemOffset(rs1, 0, lsb);
 		printMemOffset(rs1, 1, secLsb);
 		printMemOffset(rs1, 2, secMsb);
@@ -473,10 +488,10 @@ void RV32I::sb()
 	// obtain bit fields of instruction
 	u8 rs1  = getRs1();
 	u8 rs2  = getRs2();
-	u16 imm = getSplitImm();
+	s16 imm = getSplitImm();
 
 	// error checks for S-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 1);
 
 	// obtain byte to be stored 
 	u8 byte = regs[rs2];
@@ -503,10 +518,10 @@ void RV32I::sh()
 	// obtain bit fields of instruction
 	u8 rs1  = getRs1();
 	u8 rs2  = getRs2();
-	u16 imm = getSplitImm();
+	s16 imm = getSplitImm();
 
 	// error checks for S-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 2);
 
 	// obtain bytes to be stored 
 	u16 halfWord = regs[rs2];
@@ -540,10 +555,10 @@ void RV32I::sw()
 	// obtain bit fields of instruction
 	u8 rs1  = getRs1();
 	u8 rs2  = getRs2();
-	u16 imm = getSplitImm();
+	s16 imm = getSplitImm();
 
 	// error checks for S-format
-	memBoundErr(rs1, imm);
+	memBoundErr(rs1, imm, 4);
 
 	// obtain bytes to be stored 
 	u32 word  = regs[rs2];
@@ -585,7 +600,7 @@ void RV32I::sw()
 void RV32I::addi()
 {
 	// obtain bit fields of instruction
-	u16 imm = getImmed();	
+	s16 imm = getImmed();	
 	u8  rs1 =   getRs1();
 	u8  rd  =    getRd();
 
@@ -597,7 +612,7 @@ void RV32I::addi()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\taddi rd, rs1, imm" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, true);
 		regs[rd] = value; 
 		printRdSigned(rd);
 	}
@@ -611,12 +626,12 @@ void RV32I::addi()
 void RV32I::slti()
 {
 	// obtain bit fields of instruction
-	u16 imm = getImmed();	
+	s16 imm = getImmed();	
 	u8  rs1 =   getRs1();
 	u8  rd  =    getRd();
 
 	// calculate value for slti
-	u32 value = ((int) regs[rs1] < imm) ? 1 : 0;
+	u32 value = ((int) regs[rs1] < (int) imm) ? 1 : 0;
 
 	// zero register error check 
 	if (rd == 0) zRegError((int) value);	
@@ -625,7 +640,7 @@ void RV32I::slti()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tslti rd, rs1, imm" << std::endl;
-		printRegsImm_I(rs1, rd, imm);
+		printRegsImm_I(rs1, rd, imm, true);
 		regs[rd] = value; 
 		printRdSigned(rd);
 	}
@@ -633,12 +648,33 @@ void RV32I::slti()
 	else {
 		regs[rd] = value; 
 	}
-
 }
 
 void RV32I::sltiu()
 {
+	// obtain bit fields of instruction
+	s16 imm = getImmed();	
+	u8  rs1 =   getRs1();
+	u8  rd  =    getRd();
 
+	// calculate value for slti
+	u32 value = (regs[rs1] < imm) ? 1 : 0;
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tslti rd, rs1, imm" << std::endl;
+		printRegsImm_I(rs1, rd, imm, false);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::xori()
@@ -720,56 +756,63 @@ void RV32I::printMach_S()
 		}
 	}
 	std::cout << std::endl;
+}
+
+void RV32I::printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned)
+{
+	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = ";
+
+	if (isSigned)
+		std::cout << (int) regs[rs1] << std::endl;
+	else
+		std::cout << regs[rs1] << std::endl;
+
+	std::cout << "Destination register (rd):\tx" << (int) rd << " = ";
 	
+	if (isSigned)
+		std::cout << (int) regs[rd];
+	else
+		std::cout << regs[rd];
+	
+	std::cout << " (before instruction)" << std::endl;
+	std::cout << "offset (imm):\t\t\t" << (int) imm << std::endl;
 }
 
-
-void RV32I::printRegsImm_I(u8 rs1, u8 rd, u16 imm)
+void RV32I::printRegsImm_S(u8 rs1, u8 rs2, s16 imm)
 {
-	std::cout << "Source register (rs1):\t\tx" << (int)rs1 << " = "
-		<< regs[rs1] << std::endl;
-	std::cout << "Destination register (rd):\tx"
-		<< (int)rd
-		<< " = " << regs[rd] << " (before instruction)" << std::endl;
-	std::cout << "offset (imm):\t\t\t" << imm << std::endl;
-}
-
-void RV32I::printRegsImm_S(u8 rs1, u8 rs2, u16 imm)
-{
-	std::cout << "Source register (rs2):\t\tx" << (int)rs2 << " = "
-		<< regs[rs2] << std::endl;
-	std::cout << "Source reg. bin. (rs2):\t\tx" << (int)rs2 << " = ";
+	std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = "
+		<< (int) regs[rs2] << std::endl;
+	std::cout << "Source reg. bin. (rs2):\t\tx" << (int) rs2 << " = ";
 	printBytes(u32Bit(regs[rs2]).to_string());
-	std::cout << "Source register (rs1):\t\tx" << (int)rs1 << " = "
-		<< regs[rs1] << std::endl;
-	std::cout << "Memory offset (imm):\t\t" << imm << std::endl;
+	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = "
+		<< (int) regs[rs1] << std::endl;
+	std::cout << "Memory offset (imm):\t\t" << (int) imm << std::endl;
 	std::cout << "x"
-		<< (int)rs1 << " + imm:\t\t\t"
-		<< imm + regs[rs1] << std::endl;
-	
+		<< (int) rs1 << " + imm:\t\t\t"
+		<< (int) imm + regs[rs1] << std::endl;
 }
 
 void RV32I::printMemOffset(u8 rs1, int offset, u8 value)
 {
 	
-	std::cout << "memory[x" << (int)rs1 << " + imm + " << offset << "]:\t\t";
+	std::cout << "memory[x" << (int) rs1 << " + imm + " << offset << "]:\t\t";
 	printBytes(u8Bit(value).to_string());
 }
 
 void RV32I::printRdSigned(u8 rd)
 {
 	std::cout << "rd after instruction:\t\t";
-	std::cout << "x" << (int)rd << " = " << (int)regs[rd] << "\n";
+	std::cout << "x" << (int) rd << " = " << (int) regs[rd] << "\n";
 	std::cout << "rd after instr. binary:\t\t";
-	std::cout << "x" << (int)rd << " = "; 
+	std::cout << "x" << (int) rd << " = "; 
 	printBytes(u32Bit(regs[rd]).to_string());
 }
 void RV32I::printRdUsigned(u8 rd)
 {
 	std::cout << "rd after instruction:\t\t";
-	std::cout << "x" << (int)rd << " = " << regs[rd] << "\n";
+	std::cout << "x" << (int) rd << " = " << regs[rd] << "\n";
 	std::cout << "rd after instr. binary:\t\t";
-	std::cout << "x" << (int)rd << " = ";
+	std::cout << "x" << (int) rd << " = ";
 	printBytes(u32Bit(regs[rd]).to_string());
 }
 
@@ -783,12 +826,12 @@ void RV32I::zRegError(int value)
 	}
 }
 
-void RV32I::memBoundErr(u8 rs1, u16 imm)
+void RV32I::memBoundErr(u8 rs1, s16 imm, int i)
 {
-	if (regs[rs1] + imm > MaxMemory - 1) {
+	if (regs[rs1] + imm > MaxMemory - i || regs[rs1] + imm < 0) {
 		std::cout << "Memory offset (i.e. rs1 + imm.) out of range." << std::endl;
-		std::cout << "MaxMemory - 1 = " << MaxMemory - 1 << std::endl;
-		std::cout << "regs[rs1] + imm = " << regs[rs1] + imm << std::endl;
+		std::cout << "MaxMemory - i = " << MaxMemory - i << std::endl;
+		std::cout << "regs[rs1] + imm = " << regs[rs1] + (int) imm << std::endl;
 		running = false;
 	}
 }
@@ -815,7 +858,7 @@ RV32I::u8 RV32I::getRd()
 	return rd;	
 }
 
-RV32I::u16 RV32I::getSplitImm()
+RV32I::s16 RV32I::getSplitImm()
 {
 	// imm[11:5]
 	u8 imm11to5 = byte3 >> 1;
@@ -825,16 +868,16 @@ RV32I::u16 RV32I::getSplitImm()
 	imm4to0   |= ((byte1 << 1) & 0b11110);
 
 	// construct imm[11:0]
-	u16 imm  = imm11to5 << 5;
+	s16 imm  = imm11to5 << 5;
 	imm 	|= imm4to0;
 
 	return imm;
 }
 
 
-RV32I::u16 RV32I::getImmed()
+RV32I::s16 RV32I::getImmed()
 {
-	u16 imm = (byte2 >> 4) & 0b1111;
+	s16 imm = (byte2 >> 4) & 0b1111;
 	imm |= (byte3 << 4);
 	return imm;	
 }
@@ -847,10 +890,3 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
-
-
-
-
-
-
-

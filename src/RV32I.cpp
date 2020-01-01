@@ -261,6 +261,14 @@ void RV32I::testInstr(int test)
 		memory[3]  = 0b00000000;
 		regs[3]    =         65;
 		break;
+	case 14:
+		// andi x5, x3, 13
+		memory[0]  = 0b10010011;
+		memory[1]  = 0b11110010;
+		memory[2]  = 0b11010001;
+		memory[3]  = 0b00000000;
+		regs[3]    =         4;
+		break;
 	default:
 		std::cout << "No such test" << std::endl;
 	}
@@ -749,7 +757,29 @@ void RV32I::ori()
 
 void RV32I::andi()
 {
+	// obtain bit fields of instruction
+	s16 imm = getImmed();	
+	u8  rs1 =   getRs1();
+	u8  rd  =    getRd();
 
+	// calculate value for xori
+	u32 value = regs[rs1] & imm;
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tandi rd, rs1, imm" << std::endl;
+		printRegsImm_I(rs1, rd, imm, true);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::slli()

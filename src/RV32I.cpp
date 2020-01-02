@@ -325,6 +325,78 @@ void RV32I::testInstr(int test)
 		regs[3]    =       -128;
 		regs[4]    =        130;
 		break;
+	case 20:
+		// sll x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b10010010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =       -128;
+		regs[4]    =          2;
+		break;
+	case 21:
+		// slt x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b10100010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =       -128;
+		regs[4]    =          2;
+		break;
+	case 22:
+		// sltu x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b10110010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =       -128;
+		regs[4]    =          2;
+		break;
+	case 23:
+		// xor x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b11000010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =          5;
+		regs[4]    =          4;
+		break;
+	case 24:
+		// srl x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b11010010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =       -128;
+		regs[4]    =          2;
+		break;
+	case 25:
+		// sra x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b11010010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b01000000;
+		regs[3]    =       -128;
+		regs[4]    =          2;
+		break;
+	case 26:
+		// or x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b11100010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =          5;
+		regs[4]    =          4;
+		break;
+	case 27:
+		// and x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b11110010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =          5;
+		regs[4]    =          4;
+		break;
 	default:
 		std::cout << "No such test" << std::endl;
 	}
@@ -948,7 +1020,7 @@ void RV32I::add()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tadd rd, rs1, rs2" << std::endl;
-		printRegsImm_R(rs1, rs2, rd);
+		printRegsImm_R(rs1, rs2, rd, true);
 		regs[rd] = value; 
 		printRdSigned(rd);
 	}
@@ -975,7 +1047,7 @@ void RV32I::sub()
 	if (printInfo) {
 		printMach_I();
 		std::cout << "Assembly:\t\t\tadd rd, rs1, rs2" << std::endl;
-		printRegsImm_R(rs1, rs2, rd);
+		printRegsImm_R(rs1, rs2, rd, true);
 		regs[rd] = value; 
 		printRdSigned(rd);
 	}
@@ -983,7 +1055,6 @@ void RV32I::sub()
 	else {
 		regs[rd] = value; 
 	}
-
 }
 
 void RV32I::addSub()
@@ -998,31 +1069,165 @@ void RV32I::addSub()
 
 void RV32I::sll()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
 
+	// calculate value for srai
+	u32 value = regs[rs1] << regs[rs2];
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tsll rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, true);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::slt()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
 
+	// calculate value for slt
+	u32 value = ((int) regs[rs1] < (int) regs[rs2]) ? 1 : 0;
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tslt rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, true);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::sltu()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
 
+	// calculate value for sltu
+	u32 value = (regs[rs1] < regs[rs2]) ? 1 : 0;
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tsltu rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, false);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::xOr()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
 
+	// calculate value for xor
+	u32 value = regs[rs1] ^ regs[rs2];
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\txor rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, false);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::srl()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
+
+	// calculate value for srl
+	u32 value = regs[rs1] >> regs[rs2]; 
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tsrl rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, false);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 
 }
 
 void RV32I::sra()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
+
+	// calculate value for srai
+	u32 value = (int) regs[rs1] >> regs[rs2]; 
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tsra rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, false);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 
 }
 
@@ -1038,12 +1243,56 @@ void RV32I::sr_R()
 
 void RV32I::Or()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
 
+	// calculate value for or
+	u32 value = regs[rs1] | regs[rs2];
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tor rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, false);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::And()
 {
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
 
+	// calculate value for andi
+	u32 value = regs[rs1] & regs[rs2];
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tand rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd, false);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::printMach_I()
@@ -1114,24 +1363,34 @@ void RV32I::printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned)
 
 void RV32I::printRegsImm_S(u8 rs1, u8 rs2, s16 imm)
 {
-	std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = "
-		<< (int) regs[rs2] << std::endl;
+	std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = ";
 	std::cout << "Source reg. bin. (rs2):\t\tx" << (int) rs2 << " = ";
 	printBytes(u32Bit(regs[rs2]).to_string());
-	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = "
-		<< (int) regs[rs1] << std::endl;
+	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = ";
 	std::cout << "Memory offset (imm):\t\t" << (int) imm << std::endl;
 	std::cout << "x"
 		<< (int) rs1 << " + imm:\t\t\t"
 		<< (int) imm + regs[rs1] << std::endl;
 }
 
-void RV32I::printRegsImm_R(u8 rs1, u8 rs2, u8 rd)
+void RV32I::printRegsImm_R(u8 rs1, u8 rs2, u8 rd, bool isSigned)
 {
-	std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = "
-		<< (int) regs[rs2] << std::endl;
-	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = "
-		<< (int) regs[rs1] << std::endl;
+	std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = ";
+
+	if (isSigned)
+		std::cout << (int) regs[rs2] << std::endl;
+	else
+		std::cout << regs[rs2] << std::endl;
+
+	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = ";
+
+	if (isSigned)
+		std::cout << (int) regs[rs1] << std::endl;
+	else
+		std::cout << regs[rs1] << std::endl;
+
+	std::cout << "Source reg. bin. (rs1):\t\tx" << (int) rs1 << " = ";
+	printBytes(u32Bit(regs[rs1]).to_string());
 	std::cout << "Destination register (rd):\tx" << (int) rd << " = "
 		<< (int) regs[rd] 
 		<< " (before instruction)" << std::endl;

@@ -94,7 +94,7 @@ private:
 	void printMach_S();
 	void printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned);
 	void printRegsImm_S(u8 rs1, u8 rs2, s16 imm);
-	void printRegsImm_R(u8 rs1, u8 rs2, u8 rd);
+	void printRegsImm_R(u8 rs1, u8 rs2, u8 rd, bool isSigned);
 	void printMemOffset(u8 rs1, int offset, u8 value);
 	void printRdSigned(u8 rd);
 	void printRdUsigned(u8 rd);

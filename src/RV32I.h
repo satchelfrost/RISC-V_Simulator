@@ -37,7 +37,7 @@ private:
 	void aupic();
 	void lui();
 	void store();
-	void regToReg();	
+	void rFormat();	
 	void branch();
 	void jal();
 	void error();
@@ -67,7 +67,21 @@ private:
 	void slli();
 	void srli();
 	void srai();
-	void sr();
+	void sr_I();
+
+	// R format instructions
+	void add();
+	void sub();
+	void addSub();
+	void sll();
+	void slt();
+	void sltu();
+	void xOr();
+	void srl();
+	void sra();
+	void sr_R();
+	void Or();
+	void And();
 
 	// Bytes for constructing machine instruction 
 	u8 byte0 = 0; // LSB
@@ -80,6 +94,7 @@ private:
 	void printMach_S();
 	void printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned);
 	void printRegsImm_S(u8 rs1, u8 rs2, s16 imm);
+	void printRegsImm_R(u8 rs1, u8 rs2, u8 rd);
 	void printMemOffset(u8 rs1, int offset, u8 value);
 	void printRdSigned(u8 rd);
 	void printRdUsigned(u8 rd);
@@ -92,6 +107,7 @@ private:
 	u8  getRs1();
 	u8  getRs2();
 	u8  getRd();
+	u8  get31to25();
 	s16 getSplitImm();
 	s16 getImmed();
 

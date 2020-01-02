@@ -30,7 +30,7 @@ bool RV32I::Fetch()
 	case 0b00010111: aupic();	break;
 	case 0b00110111: lui();		break;
 	case 0b00100011: store();	break;
-	case 0b00110011: regToReg();	break;
+	case 0b00110011: rFormat();	break;
 	case 0b01100011: branch();	break;
 	case 0b01101111: jal();		break;
 	default:   error();
@@ -50,7 +50,7 @@ void RV32I::load()
 	case 0b010: lw();	break;
 	case 0b100: lbu();	break;
 	case 0b101: lhu();	break;
-	case 0b110: lwu();	break;
+	case 0b110: lwu();	break; // not apart of RV32I
 	default: error(); 
 	}
 }
@@ -65,11 +65,11 @@ void RV32I::immediate()
 
 	switch (funct3) {
 	case 0b000: addi();	break; 
-	case 0b001: slli();	break; 
+	case 0b001: slli();	break;
 	case 0b010: slti();	break;
 	case 0b011: sltiu();	break;
 	case 0b100: xori();	break;
-	case 0b101: sr();	break;
+	case 0b101: sr_I();	break; // two instructions
 	case 0b110: ori();	break;
 	case 0b111: andi();	break;
 	default: error();
@@ -104,8 +104,22 @@ void RV32I::store()
 	}
 }
 
-void RV32I::regToReg()
+void RV32I::rFormat()
 {
+	u8 funct3 = (byte1 >> 4) & 0b111;
+
+	switch (funct3) {
+	case 0b000: addSub();	break; // two instructions
+	case 0b001: sll();	break;
+	case 0b010: slt();	break;
+	case 0b011: sltu();	break;
+	case 0b100: xOr();	break;
+	case 0b101: sr_R();	break; // two instructions
+	case 0b110: Or();	break;
+	case 0b111: And();	break;
+	default: error();
+	}
+
 }
 
 void RV32I::branch()
@@ -269,6 +283,48 @@ void RV32I::testInstr(int test)
 		memory[3]  = 0b00000000;
 		regs[3]    =         4;
 		break;
+	case 15:
+		// slli x5, x3, 4
+		memory[0]  = 0b10010011;
+		memory[1]  = 0b10010010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =         17;
+		break;
+	case 16:
+		// srli x5, x3, 4
+		memory[0]  = 0b10010011;
+		memory[1]  = 0b11010010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =       -128;
+		break;
+	case 17:
+		// srai x5, x3, 4
+		memory[0]  = 0b10010011;
+		memory[1]  = 0b11010010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b01000000;
+		regs[3]    =       -128;
+		break;
+	case 18:
+		// add x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b10000010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b00000000;
+		regs[3]    =       -128;
+		regs[4]    =        130;
+		break;
+	case 19:
+		// sub x5, x3, x4
+		memory[0]  = 0b10110011;
+		memory[1]  = 0b10000010;
+		memory[2]  = 0b01000001;
+		memory[3]  = 0b01000000;
+		regs[3]    =       -128;
+		regs[4]    =        130;
+		break;
 	default:
 		std::cout << "No such test" << std::endl;
 	}
@@ -425,7 +481,6 @@ void RV32I::lbu()
 	}
 }
 
-
 void RV32I::lhu()
 {
 	// obtain bit fields of instruction
@@ -464,7 +519,7 @@ void RV32I::lhu()
 }
 
 
-void RV32I::lwu()
+void RV32I::lwu() // not apart of RV32I
 {
 	// obtain bit fields of instruction
 	s16 imm = getImmed();	
@@ -762,7 +817,7 @@ void RV32I::andi()
 	u8  rs1 =   getRs1();
 	u8  rd  =    getRd();
 
-	// calculate value for xori
+	// calculate value for andi
 	u32 value = regs[rs1] & imm;
 
 	// zero register error check 
@@ -784,25 +839,211 @@ void RV32I::andi()
 
 void RV32I::slli()
 {
+	// obtain bit fields of instruction
+	s16 imm = getImmed();	
+	imm    &= 0b11111;
+	u8  rs1 = getRs1();
+	u8  rd  = getRd();
 
+	// calculate value for slli
+	u32 value = regs[rs1] << imm; 
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tslli rd, rs1, imm" << std::endl;
+		printRegsImm_I(rs1, rd, imm, true);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::srli()
 {
+	// obtain bit fields of instruction
+	s16 imm = getImmed();	
+	imm    &= 0b11111;
+	u8  rs1 = getRs1();
+	u8  rd  = getRd();
 
+	// calculate value for srli
+	u32 value = regs[rs1] >> imm; 
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tsrli rd, rs1, imm" << std::endl;
+		printRegsImm_I(rs1, rd, imm, true);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::srai()
 {
+	// obtain bit fields of instruction
+	s16 imm = getImmed();	
+	imm    &= 0b11111;
+	u8  rs1 = getRs1();
+	u8  rd  = getRd();
+
+	// calculate value for srai
+	u32 value = (int) regs[rs1] >> imm; 
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tsrai rd, rs1, imm" << std::endl;
+		printRegsImm_I(rs1, rd, imm, true);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
+}
+
+void RV32I::sr_I()
+{
+	u8 srOpcode = get31to25();
+	switch (srOpcode) {
+	case 0b0000000: srli(); break;
+	case 0b0100000: srai(); break;
+	default: error();
+	}
+}
+
+void RV32I::add()
+{
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
+
+	// calculate value for srai
+	u32 value = (int) regs[rs1] + (int) regs[rs2];
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tadd rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
+}
+
+void RV32I::sub()
+{
+	// obtain bit fields of instruction
+	u8  rs1 = getRs1();
+	u8  rs2 = getRs2();
+	u8  rd  = getRd();
+
+	// calculate value for srai
+	u32 value = (int) regs[rs1] - (int) regs[rs2];
+
+	// zero register error check 
+	if (rd == 0) zRegError((int) value);	
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_I();
+		std::cout << "Assembly:\t\t\tadd rd, rs1, rs2" << std::endl;
+		printRegsImm_R(rs1, rs2, rd);
+		regs[rd] = value; 
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 
 }
 
-void RV32I::sr()
+void RV32I::addSub()
 {
-	// check bits 25 to 31
-	// if 0: srli
-	// if 1: srai
-	// else error
+	u8 srOpcode = get31to25();
+	switch (srOpcode) {
+	case 0b0000000: add(); break;
+	case 0b0100000: sub(); break;
+	default: error();
+	}
+}
+
+void RV32I::sll()
+{
+
+}
+
+void RV32I::slt()
+{
+
+}
+
+void RV32I::sltu()
+{
+
+}
+
+void RV32I::xOr()
+{
+
+}
+
+void RV32I::srl()
+{
+
+}
+
+void RV32I::sra()
+{
+
+}
+
+void RV32I::sr_R()
+{
+	u8 srOpcode = get31to25();
+	switch (srOpcode) {
+	case 0b0000000: srl(); break;
+	case 0b0100000: sra(); break;
+	default: error();
+	}
+}
+
+void RV32I::Or()
+{
+
+}
+
+void RV32I::And()
+{
+
 }
 
 void RV32I::printMach_I()
@@ -857,6 +1098,9 @@ void RV32I::printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned)
 	else
 		std::cout << regs[rs1] << std::endl;
 
+	std::cout << "Source reg. bin. (rs1):\t\tx" << (int) rs1 << " = ";
+	printBytes(u32Bit(regs[rs1]).to_string());
+
 	std::cout << "Destination register (rd):\tx" << (int) rd << " = ";
 	
 	if (isSigned)
@@ -880,6 +1124,17 @@ void RV32I::printRegsImm_S(u8 rs1, u8 rs2, s16 imm)
 	std::cout << "x"
 		<< (int) rs1 << " + imm:\t\t\t"
 		<< (int) imm + regs[rs1] << std::endl;
+}
+
+void RV32I::printRegsImm_R(u8 rs1, u8 rs2, u8 rd)
+{
+	std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = "
+		<< (int) regs[rs2] << std::endl;
+	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = "
+		<< (int) regs[rs1] << std::endl;
+	std::cout << "Destination register (rd):\tx" << (int) rd << " = "
+		<< (int) regs[rd] 
+		<< " (before instruction)" << std::endl;
 }
 
 void RV32I::printMemOffset(u8 rs1, int offset, u8 value)
@@ -940,12 +1195,16 @@ RV32I::u8 RV32I::getRs2()
 	return rs2;
 }
 
-
 RV32I::u8 RV32I::getRd()
 {
 	u8 rd = (byte0 >> 7) & 1;
 	rd |= ((byte1 << 1) & 0b11110);
 	return rd;	
+}
+
+RV32I::u8 RV32I::get31to25()
+{
+	return byte3 >> 1;
 }
 
 RV32I::s16 RV32I::getSplitImm()
@@ -980,3 +1239,5 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
+
+

@@ -34,7 +34,7 @@ private:
 	void immediate();
 	void jalr();
 	void e();
-	void aupic();
+	void auipc();
 	void lui();
 	void store();
 	void rFormat();	
@@ -92,9 +92,12 @@ private:
 	// Print stuff
 	void printMach_I();
 	void printMach_S();
+	void printMach_R();
+	void printMach_U();
 	void printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned);
 	void printRegsImm_S(u8 rs1, u8 rs2, s16 imm);
 	void printRegsImm_R(u8 rs1, u8 rs2, u8 rd, bool isSigned);
+	void printRegsImm_U(u8 rd, u32 imm);
 	void printMemOffset(u8 rs1, int offset, u8 value);
 	void printRdSigned(u8 rd);
 	void printRdUsigned(u8 rd);
@@ -110,6 +113,7 @@ private:
 	u8  get31to25();
 	s16 getSplitImm();
 	s16 getImmed();
+	u32 getImm31to12();
 
 	// print bytes from binary
 	void printBytes(string bin);

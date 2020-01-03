@@ -27,7 +27,7 @@ bool RV32I::Fetch()
 	case 0b00010011: immediate();	break; 
 	case 0b01100111: jalr();	break;
 	case 0b01110011: e();		break;
-	case 0b00010111: aupic();	break;
+	case 0b00010111: auipc();	break;
 	case 0b00110111: lui();		break;
 	case 0b00100011: store();	break;
 	case 0b00110011: rFormat();	break;
@@ -84,12 +84,64 @@ void RV32I::e()
 {
 }
 
-void RV32I::aupic()
+void RV32I::auipc()
 {
+	// obtain bit fields of instruction
+	u32 imm = getImm31to12(); 
+	u8  rd  =    getRd();
+
+	// calculate value of upper immediate
+	u32 upperImm = imm << 12; 
+	
+	// calculate value to set register
+	u32 value = PC + upperImm;
+
+	// zero register error check
+	if (rd == 0) zRegError((int) imm);
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_U();
+		std::cout << "Assembly:\t\t\tauipc rd, imm" << std::endl;
+		printRegsImm_U(rd, imm);
+		std::cout << "upper imm.\t\t\t" << upperImm << std::endl;
+		std::cout << "upper imm. (bin.)\t\t"; 
+		printBytes(u32Bit(upperImm).to_string());
+		std::cout << "PC:\t\t\t\t" << PC << std::endl;
+		std::cout << "PC + upper imm.:\t\t" << value << std::endl;
+		regs[rd] = value;
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value;
+	}
 }
 
 void RV32I::lui()
 {
+	// obtain bit fields of instruction
+	u32 imm = getImm31to12(); 
+	u8  rd  =    getRd();
+
+	// calculate value of upper immediate
+	u32 value = imm << 12; 
+
+	// zero register error check
+	if (rd == 0) zRegError((int) value);
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_U();
+		std::cout << "Assembly:\t\t\tlui rd, imm" << std::endl;
+		printRegsImm_U(rd, imm);
+		regs[rd] = value;
+		printRdSigned(rd);
+	}
+
+	else {
+		regs[rd] = value; 
+	}
 }
 
 void RV32I::store()
@@ -397,6 +449,20 @@ void RV32I::testInstr(int test)
 		regs[3]    =          5;
 		regs[4]    =          4;
 		break;
+	case 28:
+		// lui x5, 786439 
+		memory[0]  = 0b10110111;
+		memory[1]  = 0b01110010;
+		memory[2]  = 0b00000000;
+		memory[3]  = 0b11000000;
+		break;
+	case 29:
+		// auipc x5, 786439 
+		memory[0]  = 0b10010111;
+		memory[1]  = 0b01110010;
+		memory[2]  = 0b00000000;
+		memory[3]  = 0b11000000;
+		break;
 	default:
 		std::cout << "No such test" << std::endl;
 	}
@@ -432,7 +498,6 @@ void RV32I::lb()
 	else {
 		regs[rd] = signExtended; 
 	}
-
 }
 
 void RV32I::lh()
@@ -1018,7 +1083,7 @@ void RV32I::add()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tadd rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, true);
 		regs[rd] = value; 
@@ -1045,7 +1110,7 @@ void RV32I::sub()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tadd rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, true);
 		regs[rd] = value; 
@@ -1082,7 +1147,7 @@ void RV32I::sll()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tsll rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, true);
 		regs[rd] = value; 
@@ -1109,7 +1174,7 @@ void RV32I::slt()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tslt rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, true);
 		regs[rd] = value; 
@@ -1136,7 +1201,7 @@ void RV32I::sltu()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tsltu rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, false);
 		regs[rd] = value; 
@@ -1163,7 +1228,7 @@ void RV32I::xOr()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\txor rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, false);
 		regs[rd] = value; 
@@ -1190,7 +1255,7 @@ void RV32I::srl()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tsrl rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, false);
 		regs[rd] = value; 
@@ -1218,7 +1283,7 @@ void RV32I::sra()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tsra rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, false);
 		regs[rd] = value; 
@@ -1256,7 +1321,7 @@ void RV32I::Or()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tor rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, false);
 		regs[rd] = value; 
@@ -1283,7 +1348,7 @@ void RV32I::And()
 
 	// print reg. states before and after instruction
 	if (printInfo) {
-		printMach_I();
+		printMach_R();
 		std::cout << "Assembly:\t\t\tand rd, rs1, rs2" << std::endl;
 		printRegsImm_R(rs1, rs2, rd, false);
 		regs[rd] = value; 
@@ -1334,6 +1399,44 @@ void RV32I::printMach_S()
 		case 19: std::cout << "\t";	break;
 		case 24: std::cout << "\t\t";	break;
 		}
+	}
+	std::cout << std::endl;
+}
+
+void RV32I::printMach_R()
+{
+	string b3 = u8Bit(byte3).to_string();
+	string b2 = u8Bit(byte2).to_string();
+	string b1 = u8Bit(byte1).to_string();
+	string b0 = u8Bit(byte0).to_string();
+	string machInstr = b3 + b2 + b1 + b0;
+
+	// print out the machine instruction with tabs in between fields
+	std::cout << "\t\t\t\t[31:25]\trs2\trs1\tfunct3\trd\topcode\n";
+	std::cout << "Machine instruction:\t\t";
+	for (auto i = 0; i < machInstr.size(); i++) {
+		std::cout << machInstr[i]; 
+		if (i == 6 || i == 11 || i == 16 || i == 19 || i == 24)
+			std::cout << "\t";
+	}
+	std::cout << std::endl;
+}
+
+void RV32I::printMach_U()
+{
+	string b3 = u8Bit(byte3).to_string();
+	string b2 = u8Bit(byte2).to_string();
+	string b1 = u8Bit(byte1).to_string();
+	string b0 = u8Bit(byte0).to_string();
+	string machInstr = b3 + b2 + b1 + b0;
+
+	// print out the machine instruction with tabs in between fields
+	std::cout << "\t\t\t\timm[31:12]\t\trd\topcode\n";
+	std::cout << "Machine instruction:\t\t";
+	for (auto i = 0; i < machInstr.size(); i++) {
+		std::cout << machInstr[i]; 
+		if (i == 19 || i == 24)
+			std::cout << "\t";
 	}
 	std::cout << std::endl;
 }
@@ -1394,6 +1497,14 @@ void RV32I::printRegsImm_R(u8 rs1, u8 rs2, u8 rd, bool isSigned)
 	std::cout << "Destination register (rd):\tx" << (int) rd << " = "
 		<< (int) regs[rd] 
 		<< " (before instruction)" << std::endl;
+}
+
+void RV32I::printRegsImm_U(u8 rd, u32 imm)
+{
+	std::cout << "Destination register (rd):\tx" << (int) rd << " = "
+		<< (int) regs[rd] 
+		<< " (before instruction)" << std::endl;
+	std::cout << "imm:\t\t\t\t" << (int) imm << std::endl;
 }
 
 void RV32I::printMemOffset(u8 rs1, int offset, u8 value)
@@ -1490,6 +1601,14 @@ RV32I::s16 RV32I::getImmed()
 	return imm;	
 }
 
+RV32I::u32 RV32I::getImm31to12()
+{
+	u32 imm = byte3 << 12;
+	imm    |= byte2 << 4;
+	imm    |= byte1 >> 4;
+	return imm;
+}
+
 void RV32I::printBytes(string bin)
 {
 	for (auto i = 0; i < bin.size(); i++) {
@@ -1498,5 +1617,9 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
+
+
+
+
 
 

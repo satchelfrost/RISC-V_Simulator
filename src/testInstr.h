@@ -1,5 +1,7 @@
 #include <iostream>
 
+/* Sample instructions to make sure each instruction works properly */ 
+
 void RV32I::testInstr(int test)
 {
 	switch (test) {

@@ -16,6 +16,7 @@ In the future I'd like to make an assembler rather than manually entering 0's an
 
 For debug purposes this interpretation was then logged to [sample ouput](https://github.com/satchelfrost/RISC-V_Simulator/blob/master/sampleOutput) where you can see the output printed. As an example if the instruction in memory is "00000000110100011000001010000011" the sample output in debug-mode will be as follows:
 
+"
 				imm[11:0]	rs1	funct3	rd	opcode
 Machine instruction:		000000001101	00011	000	00101	0000011
 Assembly:			lb rd, imm(rs1)
@@ -26,5 +27,7 @@ offset (imm):			13
 memory[x3 + imm + 0]:		10000011
 rd after instruction:		x5 = -125
 rd after instr. binary:		x5 = 11111111 11111111 11111111 10000011
+
+"
 
 Note that the source register rs1 is "00011" in this case. The interpreter knows this and accordingly prints "x3 = ...", any register will work though. Also note that the message may vary slightly depending on the instruction. When not in debug-mode the instruction will simply be executed without any printing / logging. 

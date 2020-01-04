@@ -1467,9 +1467,11 @@ void RV32I::printRegsImm_I(u8 rs1, u8 rd, s16 imm, bool isSigned)
 void RV32I::printRegsImm_S(u8 rs1, u8 rs2, s16 imm)
 {
 	std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = ";
+	std::cout << regs[rs2] << std::endl;
 	std::cout << "Source reg. bin. (rs2):\t\tx" << (int) rs2 << " = ";
 	printBytes(u32Bit(regs[rs2]).to_string());
 	std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = ";
+	std::cout << regs[rs1] << std::endl;
 	std::cout << "Memory offset (imm):\t\t" << (int) imm << std::endl;
 	std::cout << "x"
 		<< (int) rs1 << " + imm:\t\t\t"

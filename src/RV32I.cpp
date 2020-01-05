@@ -1644,15 +1644,3 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
-
-
-
-
-
-
-
-
-
-
-
-

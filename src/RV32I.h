@@ -83,6 +83,14 @@ private:
 	void Or();
 	void And();
 
+	// branch instrs.
+	void beq();
+	void bne();
+	void blt();
+	void bge();
+	void bltu();
+	void bgeu();
+
 	// Bytes for constructing machine instruction 
 	u8 byte0 = 0; // LSB
 	u8 byte1 = 0;
@@ -98,6 +106,7 @@ private:
 	void printRegsImm_S(u8 rs1, u8 rs2, s16 imm);
 	void printRegsImm_R(u8 rs1, u8 rs2, u8 rd, bool isSigned);
 	void printRegsImm_U(u8 rd, u32 imm);
+	void printRegsImm_B(u8 rs1, u8 rs2, s16 imm, bool isSigned);
 	void printMemOffset(u8 rs1, int offset, u8 value);
 	void printRdSigned(u8 rd);
 	void printRdUsigned(u8 rd);

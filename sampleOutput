@@ -359,3 +359,91 @@ rd after instruction:		x5 = -1073713148
 rd after instr. binary:		x5 = 11000000 00000000 01110000 00000100
 
 
+				imm[31:12]		rd	opcode
+Machine instruction:		11000000000000000111	00101	1101111
+Assembly:			jal rd, imm
+Destination register (rd):	x5 = 0 (before instruction)
+imm:				-262137
+PC (before):			4
+PC (after):			-262133
+ra				8
+rd after instruction:		x5 = 8
+rd after instr. binary:		x5 = 00000000 00000000 00000000 00001000
+
+
+				imm[31:12]		rd	opcode
+Machine instruction:		11000000000000011000	00101	1100111
+Assembly:			jalr rd, imm
+Destination register (rd):	x5 = 0 (before instruction)
+imm:				-1024
+PC (before):			4
+PC (after):			-1021
+ra				8
+rd after instruction:		x5 = 8
+rd after instr. binary:		x5 = 00000000 00000000 00000000 00001000
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000000		00111	00011	000	00101		1100011
+Assembly:			beq rs1, rs2, imm
+Source register (rs2):		x7 = 6
+Source register (rs1):		x3 = 6
+imm:				5
+PC (before):			4
+branch target addr.:		9
+PC (after):			9
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000000		00111	00011	001	00101		1100011
+Assembly:			bne rs1, rs2, imm
+Source register (rs2):		x7 = 6
+Source register (rs1):		x3 = 6
+imm:				5
+PC (before):			4
+branch target addr.:		9
+PC (after):			4
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000000		00111	00011	100	00101		1100011
+Assembly:			blt rs1, rs2, imm
+Source register (rs2):		x7 = 6
+Source register (rs1):		x3 = -6
+imm:				5
+PC (before):			4
+branch target addr.:		9
+PC (after):			9
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000000		00111	00011	101	00101		1100011
+Assembly:			bge rs1, rs2, imm
+Source register (rs2):		x7 = -6
+Source register (rs1):		x3 = 6
+imm:				5
+PC (before):			4
+branch target addr.:		9
+PC (after):			9
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000000		00111	00011	110	00101		1100011
+Assembly:			bltu rs1, rs2, imm
+Source register (rs2):		x7 = 6
+Source register (rs1):		x3 = 4294967290
+imm:				5
+PC (before):			4
+branch target addr.:		9
+PC (after):			4
+
+
+				imm[11:5]	rs2	rs1	funct3	imm[4:0]	opcode
+Machine instruction:		0000000		00111	00011	111	00101		1100011
+Assembly:			bgeu rs1, rs2, imm
+Source register (rs2):		x7 = 4294967290
+Source register (rs1):		x3 = 6
+imm:				5
+PC (before):			4
+branch target addr.:		9
+PC (after):			4

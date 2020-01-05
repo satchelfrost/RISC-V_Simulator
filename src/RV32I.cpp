@@ -79,6 +79,39 @@ void RV32I::immediate()
 
 void RV32I::jalr()
 {
+	// obtain bit fields of instruction
+	u32 imm = getImmed(); 
+	u8 rd   = getRd();
+	u8 rs1  = getRs1();
+
+	// sign extend if necessary
+	if (imm >> 11 == 1)
+		imm |= 0b11111111111111111111000000000000;
+	
+	// calculate value to set register
+	u32 value = regs[rs1] + (int) imm;
+	u32 after = PC + 4;
+
+	// zero register error check
+	if (rd == 0) zRegError((int) value);
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_U();
+		std::cout << "Assembly:\t\t\tjalr rd, imm" << std::endl;
+		printRegsImm_U(rd, imm);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "PC (after):\t\t\t" << (int) value << std::endl;
+		std::cout << "ra\t\t\t\t" << after << std::endl;
+		PC = value;
+		regs[rd] = after;
+		printRdSigned(rd);
+	}
+
+	else {
+		PC = value;
+		regs[rd] = after;
+	}
 }
 
 void RV32I::e()
@@ -93,12 +126,12 @@ void RV32I::auipc()
 
 	// calculate value of upper immediate
 	u32 upperImm = imm << 12; 
-	
+
 	// calculate value to set register
 	u32 value = PC + upperImm;
 
 	// zero register error check
-	if (rd == 0) zRegError((int) imm);
+	if (rd == 0) zRegError((int) value);
 
 	// print reg. states before and after instruction
 	if (printInfo) {
@@ -177,10 +210,54 @@ void RV32I::rFormat()
 
 void RV32I::branch()
 {
+	u8 funct3 = (byte1 >> 4) & 0b111;
+
+	switch (funct3) {
+	case 0b000: beq();	break;
+	case 0b001: bne();	break;
+	case 0b100: blt();	break;
+	case 0b101: bge();	break;
+	case 0b110: bltu();	break;
+	case 0b111: bgeu();	break;
+	default: error(); 
+	}
+	
 }
 
 void RV32I::jal()
 {
+	// obtain bit fields of instruction
+	u32 imm = getImm31to12(); 
+	u8  rd  =    getRd();
+
+	// sign extend if necessary
+	if (imm >> 19 == 1)
+		imm |= 0b11111111111100000000000000000000;
+	
+	// calculate value to set register
+	u32 value = (int) PC + (int) imm;
+	u32 after = PC + 4;
+
+	// zero register error check
+	if (rd == 0) zRegError((int) value);
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_U();
+		std::cout << "Assembly:\t\t\tjal rd, imm" << std::endl;
+		printRegsImm_U(rd, imm);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "PC (after):\t\t\t" << (int) value << std::endl;
+		std::cout << "ra\t\t\t\t" << after << std::endl;
+		PC = value;
+		regs[rd] = after;
+		printRdSigned(rd);
+	}
+
+	else {
+		PC = value;
+		regs[rd] = after;
+	}
 }
 
 void RV32I::error()
@@ -1081,6 +1158,215 @@ void RV32I::And()
 	}
 }
 
+void RV32I::beq()
+{
+	// obtain bit fields of instruction
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	s16 imm = getSplitImm();
+
+	// sign extend if necessary
+	if (imm >> 11 == 1)
+		imm |= 0b11111111111100000000000000000000;
+
+	// calculate value to set register
+	u32 bta = (int) PC + (int) imm;
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tbeq rs1, rs2, imm" << std::endl;
+		printRegsImm_B(rs1, rs2, imm, true);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "branch target addr.:\t\t" << bta << std::endl;
+		
+		if (regs[rs1] == regs[rs2])
+			PC = bta;
+
+		std::cout << "PC (after):\t\t\t" << (int) PC << std::endl;
+	}
+
+	else {
+		if (regs[rs1] == regs[rs2])
+			PC = bta;
+	}
+}
+
+void RV32I::bne()
+{
+	// obtain bit fields of instruction
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	s16 imm = getSplitImm();
+
+	// sign extend if necessary
+	if (imm >> 11 == 1)
+		imm |= 0b11111111111100000000000000000000;
+
+	// calculate value to set register
+	u32 bta = (int) PC + (int) imm;
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tbne rs1, rs2, imm" << std::endl;
+		printRegsImm_B(rs1, rs2, imm, true);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "branch target addr.:\t\t" << bta << std::endl;
+		
+		if (regs[rs1] != regs[rs2])
+			PC = bta;
+
+		std::cout << "PC (after):\t\t\t" << (int) PC << std::endl;
+	}
+
+	else {
+		if (regs[rs1] != regs[rs2])
+			PC = bta;
+	}
+
+}
+
+void RV32I::blt()
+{
+	// obtain bit fields of instruction
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	s16 imm = getSplitImm();
+
+	// sign extend if necessary
+	if (imm >> 11 == 1)
+		imm |= 0b11111111111100000000000000000000;
+
+	// calculate value to set register
+	u32 bta = (int) PC + (int) imm;
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tblt rs1, rs2, imm" << std::endl;
+		printRegsImm_B(rs1, rs2, imm, true);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "branch target addr.:\t\t" << bta << std::endl;
+		
+		if ((int) regs[rs1] < (int) regs[rs2])
+			PC = bta;
+
+		std::cout << "PC (after):\t\t\t" << (int) PC << std::endl;
+	}
+
+	else {
+		if ((int) regs[rs1] < regs[rs2])
+			PC = bta;
+	}
+
+}
+
+void RV32I::bge()
+{
+	// obtain bit fields of instruction
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	s16 imm = getSplitImm();
+
+	// sign extend if necessary
+	if (imm >> 11 == 1)
+		imm |= 0b11111111111100000000000000000000;
+
+	// calculate value to set register
+	u32 bta = (int) PC + (int) imm;
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tbge rs1, rs2, imm" << std::endl;
+		printRegsImm_B(rs1, rs2, imm, true);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "branch target addr.:\t\t" << bta << std::endl;
+		
+		if ((int) regs[rs1] >= (int) regs[rs2])
+			PC = bta;
+
+		std::cout << "PC (after):\t\t\t" << (int) PC << std::endl;
+	}
+
+	else {
+		if ((int) regs[rs1] == regs[rs2])
+			PC = bta;
+	}
+
+}
+
+void RV32I::bltu()
+{
+	// obtain bit fields of instruction
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	s16 imm = getSplitImm();
+
+	// sign extend if necessary
+	if (imm >> 11 == 1)
+		imm |= 0b11111111111100000000000000000000;
+
+	// calculate value to set register
+	u32 bta = (int) PC + (int) imm;
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tbltu rs1, rs2, imm" << std::endl;
+		printRegsImm_B(rs1, rs2, imm, false);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "branch target addr.:\t\t" << bta << std::endl;
+		
+		if (regs[rs1] < regs[rs2])
+			PC = bta;
+
+		std::cout << "PC (after):\t\t\t" << (int) PC << std::endl;
+	}
+
+	else {
+		if (regs[rs1] < regs[rs2])
+			PC = bta;
+	}
+
+}
+
+void RV32I::bgeu()
+{
+	// obtain bit fields of instruction
+	u8 rs1  = getRs1();
+	u8 rs2  = getRs2();
+	s16 imm = getSplitImm();
+
+	// sign extend if necessary
+	if (imm >> 11 == 1)
+		imm |= 0b11111111111100000000000000000000;
+
+	// calculate value to set register
+	u32 bta = (int) PC + (int) imm;
+
+	// print reg. states before and after instruction
+	if (printInfo) {
+		printMach_S();
+		std::cout << "Assembly:\t\t\tbgeu rs1, rs2, imm" << std::endl;
+		printRegsImm_B(rs1, rs2, imm, false);
+		std::cout << "PC (before):\t\t\t" << PC << std::endl;
+		std::cout << "branch target addr.:\t\t" << bta << std::endl;
+		
+		if (regs[rs1] >= regs[rs2])
+			PC = bta;
+
+		std::cout << "PC (after):\t\t\t" << (int) PC << std::endl;
+	}
+
+	else {
+		if (regs[rs1] >= regs[rs2])
+			PC = bta;
+	}
+
+}
+
 void RV32I::printMach_I()
 {
 	string b3 = u8Bit(byte3).to_string();
@@ -1230,6 +1516,24 @@ void RV32I::printRegsImm_U(u8 rd, u32 imm)
 	std::cout << "imm:\t\t\t\t" << (int) imm << std::endl;
 }
 
+void RV32I::printRegsImm_B(u8 rs1, u8 rs2, s16 imm, bool isSigned)
+{
+	if (isSigned) {
+		std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = ";
+		std::cout << (int) regs[rs2] << std::endl;
+		std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = ";
+		std::cout << (int) regs[rs1] << std::endl;
+		std::cout << "imm:\t\t\t\t" << (int) imm << std::endl;
+	}
+	else {
+		std::cout << "Source register (rs2):\t\tx" << (int) rs2 << " = ";
+		std::cout << regs[rs2] << std::endl;
+		std::cout << "Source register (rs1):\t\tx" << (int) rs1 << " = ";
+		std::cout << regs[rs1] << std::endl;
+		std::cout << "imm:\t\t\t\t" << (int) imm << std::endl;
+	}
+}
+
 void RV32I::printMemOffset(u8 rs1, int offset, u8 value)
 {
 	
@@ -1340,6 +1644,12 @@ void RV32I::printBytes(string bin)
 	}
 	std::cout << std::endl;
 }
+
+
+
+
+
+
 
 
 

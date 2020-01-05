@@ -277,6 +277,75 @@ void RV32I::testInstr(int test)
 		memory[2]  = 0b00000000;
 		memory[3]  = 0b11000000;
 		break;
+	case 30:
+		// jal x5, 786439 
+		memory[0]  = 0b11101111;
+		memory[1]  = 0b01110010;
+		memory[2]  = 0b00000000;
+		memory[3]  = 0b11000000;
+		break;
+	case 31:
+		// jalr x5, -1024 
+		memory[0]  = 0b11100111;
+		memory[1]  = 0b10000010;
+		memory[2]  = 0b00000001;
+		memory[3]  = 0b11000000;
+		regs[3]    = 3;
+		break;
+	case 32:
+		// beq x3, x4, 5 
+		memory[0]  = 0b11100011;
+		memory[1]  = 0b10000010;
+		memory[2]  = 0b01110001;
+		memory[3]  = 0b00000000;
+		regs[3]    = 6;
+		regs[7]    = 6;
+		break;
+	case 33:
+		// bne x3, x4, 5 
+		memory[0]  = 0b11100011;
+		memory[1]  = 0b10010010;
+		memory[2]  = 0b01110001;
+		memory[3]  = 0b00000000;
+		regs[3]    = 6;
+		regs[7]    = 6;
+		break;
+	case 34:
+		// blt x3, x4, 5 
+		memory[0]  = 0b11100011;
+		memory[1]  = 0b11000010;
+		memory[2]  = 0b01110001;
+		memory[3]  = 0b00000000;
+		regs[3]    = -6;
+		regs[7]    = 6;
+		break;
+	case 35:
+		// bge x3, x4, 5 
+		memory[0]  = 0b11100011;
+		memory[1]  = 0b11010010;
+		memory[2]  = 0b01110001;
+		memory[3]  = 0b00000000;
+		regs[3]    = 6;
+		regs[7]    = -6;
+		break;
+	case 36:
+		// bltu x3, x4, 5 
+		memory[0]  = 0b11100011;
+		memory[1]  = 0b11100010;
+		memory[2]  = 0b01110001;
+		memory[3]  = 0b00000000;
+		regs[3]    = -6;
+		regs[7]    = 6;
+		break;
+	case 37:
+		// bgeu x3, x4, 5 
+		memory[0]  = 0b11100011;
+		memory[1]  = 0b11110010;
+		memory[2]  = 0b01110001;
+		memory[3]  = 0b00000000;
+		regs[3]    = 6;
+		regs[7]    = -6;
+		break;
 	default:
 		std::cout << "No such test" << std::endl;
 	}

@@ -58,6 +58,7 @@ void RV32I::load()
 
 void RV32I::fence()
 {
+	// currently missing
 }
 
 void RV32I::immediate()
@@ -116,6 +117,7 @@ void RV32I::jalr()
 
 void RV32I::e()
 {
+	// ecall and ebreak, currently missing
 }
 
 void RV32I::auipc()

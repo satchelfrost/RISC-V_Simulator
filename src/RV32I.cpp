@@ -111,6 +111,7 @@ void RV32I::jalr()
 
 	else {
 		PC = value;
+		PC &= 0xfffffffe;
 		regs[rd] = after;
 	}
 }

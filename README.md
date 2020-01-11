@@ -1,5 +1,7 @@
 # RISC-V_Simulator
 
+This project was re-written in C and moved [here](https://github.com/satchelfrost/RISC-V_Simulator_C) version.
+
 This project aims to create a RISC-V instruction set simulator (ISS).
 
 ### RV32I As described in the specification:
